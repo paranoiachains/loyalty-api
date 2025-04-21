@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/paranoiachains/loyalty-api/internal/auth"
 	"github.com/paranoiachains/loyalty-api/internal/logger"
 	"go.uber.org/zap"
 )
@@ -56,26 +57,29 @@ func shouldDecompress(req *http.Request) bool {
 
 func Compression() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// decompress request
 		if shouldDecompress(c.Request) {
-			r, _ := gzip.NewReader(c.Request.Body)
-			defer r.Close()
-
-			body, _ := io.ReadAll(r)
-			c.Request.Body = io.NopCloser(bytes.NewReader(body))
-			c.Request.Header.Del("Content-Encoding")
-			logger.Log.Info("compression", zap.Bool("decompressed request?", true))
+			r, err := gzip.NewReader(c.Request.Body)
+			if err == nil {
+				defer r.Close()
+				body, _ := io.ReadAll(r)
+				c.Request.Body = io.NopCloser(bytes.NewReader(body))
+				c.Request.Header.Del("Content-Encoding")
+				logger.Log.Info("decompressed request", zap.Bool("ok", true))
+			}
 		}
+
+		// if client doesn't accept gzip, skip
 		if !shouldCompress(c.Request) {
+			c.Next()
 			return
 		}
+
 		gz := gzip.NewWriter(c.Writer)
 		defer gz.Close()
+		c.Writer = &gzipWriter{ResponseWriter: c.Writer, writer: gz}
 
 		c.Header("Content-Encoding", "gzip")
-		c.Header("Accept-Encoding", "gzip")
-		c.Writer = &gzipWriter{c.Writer, gz}
-
-		logger.Log.Info("compression", zap.Bool("compressed response?", true))
 		c.Next()
 	}
 }
@@ -83,4 +87,27 @@ func Compression() gin.HandlerFunc {
 type gzipWriter struct {
 	gin.ResponseWriter
 	writer *gzip.Writer
+}
+
+func (w *gzipWriter) Write(b []byte) (int, error) {
+	return w.writer.Write(b)
+}
+
+func Auth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenString, err := c.Cookie("jwt_token")
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		userID := auth.GetUserId(tokenString)
+		if userID == -1 {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		c.Set("userID", userID)
+
+		c.Next()
+	}
 }
