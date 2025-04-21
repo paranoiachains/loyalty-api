@@ -38,7 +38,7 @@ func BuildJWTString(userID int) (string, error) {
 	return tokenString, nil
 }
 
-func GetUserId(tokenString string) int {
+func GetUserID(tokenString string) int {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims,
 		func(t *jwt.Token) (any, error) {

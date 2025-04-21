@@ -101,7 +101,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		userID := auth.GetUserId(tokenString)
+		userID := auth.GetUserID(tokenString)
 		if userID == -1 {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
