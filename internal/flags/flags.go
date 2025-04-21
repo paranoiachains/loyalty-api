@@ -9,15 +9,6 @@ import (
 	"github.com/caarlos0/env/v11"
 )
 
-// service's own flag set
-var accruals = flag.NewFlagSet("", flag.ExitOnError)
-
-// variables that were parsed from environment
-var parsedEnv Environment
-
-// parse variables only once
-var once sync.Once
-
 var (
 	RunAddress           string
 	DatabaseURI          string
@@ -31,6 +22,14 @@ type Environment struct {
 }
 
 func init() {
+	// service's own flag set
+	accruals := flag.NewFlagSet("", flag.ExitOnError)
+
+	// variables that were parsed from environment
+	var parsedEnv Environment
+
+	// parse variables only once
+	var once sync.Once
 	once.Do(func() {
 		accruals.StringVar(&RunAddress, "a", "localhost:8080", "service address and port")
 		accruals.StringVar(&DatabaseURI, "d", "postgresql://postgres:postgres@localhost/postgres?sslmode=disable", "database connection uri")
