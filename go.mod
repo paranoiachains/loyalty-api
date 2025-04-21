@@ -1,6 +1,6 @@
 module github.com/paranoiachains/loyalty-api
 
-go 1.24.2
+go 1.23.8
 
 require (
 	github.com/bytedance/sonic v1.13.2 // indirect
