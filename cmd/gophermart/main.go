@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	router := gin.New()
-	router.Use(gin.Recovery(), middleware.Logger(), middleware.Compression())
+	r := gin.New()
+	r.Use(gin.Recovery(), middleware.Logger(), middleware.Compression())
 
 	// connect to db only once
 	var once sync.Once
@@ -23,14 +23,18 @@ func main() {
 		}
 	})
 
-	group := router.Group("/api/user/")
-	group.POST("register", handlers.Register)
-	group.POST("login", handlers.Login)
-	group.POST("orders", handlers.LoadOrder)
-	group.GET("orders", handlers.GetOrder)
-	group.GET("balance", handlers.GetBalance)
-	group.POST("balance/withdraw", handlers.RequestWithdraw)
-	group.GET("withdrawals", handlers.Withdrawals)
+	r.POST("/api/user/register", handlers.Register)
+	r.POST("/api/user/login", handlers.Login)
 
-	router.Run(flags.RunAddress)
+	authGroup := r.Group("/")
+	authGroup.Use(middleware.Auth())
+	{
+		authGroup.POST("/api/user/orders", handlers.LoadOrder)
+		authGroup.GET("/api/user/orders", handlers.GetOrder)
+		authGroup.GET("/api/user/balance", handlers.GetBalance)
+		authGroup.POST("/api/user/balance/withdraw", handlers.RequestWithdraw)
+		authGroup.GET("/api/user/withdrawals", handlers.Withdrawals)
+	}
+
+	r.Run(flags.RunAddress)
 }
