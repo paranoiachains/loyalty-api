@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/paranoiachains/loyalty-api/internal/flags"
 	"github.com/paranoiachains/loyalty-api/internal/handlers"
 	"github.com/paranoiachains/loyalty-api/internal/middleware"
 )
@@ -19,5 +20,5 @@ func main() {
 	group.POST("balance/withdraw", handlers.RequestWithdraw)
 	group.GET("withdrawals", handlers.Withdrawals)
 
-	router.Run()
+	router.Run(flags.RunAddress)
 }
