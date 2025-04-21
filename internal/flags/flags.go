@@ -33,7 +33,7 @@ type Environment struct {
 func init() {
 	once.Do(func() {
 		accruals.StringVar(&RunAddress, "a", "localhost:8080", "service address and port")
-		accruals.StringVar(&DatabaseURI, "d", "", "database connection uri")
+		accruals.StringVar(&DatabaseURI, "d", "postgresql://postgres:postgres@localhost/postgres?sslmode=disable", "database connection uri")
 		accruals.StringVar(&AccrualSystemAddress, "r", "", "accrual system address")
 		accruals.Parse(os.Args[1:])
 
