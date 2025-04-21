@@ -1,7 +1,10 @@
 package main
 
 import (
+	"sync"
+
 	"github.com/gin-gonic/gin"
+	"github.com/paranoiachains/loyalty-api/internal/database"
 	"github.com/paranoiachains/loyalty-api/internal/flags"
 	"github.com/paranoiachains/loyalty-api/internal/handlers"
 	"github.com/paranoiachains/loyalty-api/internal/middleware"
@@ -10,6 +13,15 @@ import (
 func main() {
 	router := gin.New()
 	router.Use(gin.Recovery(), middleware.Logger(), middleware.Compression())
+
+	// connect to db only once
+	var once sync.Once
+	once.Do(func() {
+		err := database.Connect(flags.DatabaseURI)
+		if err != nil {
+			panic(err)
+		}
+	})
 
 	group := router.Group("/api/user/")
 	group.POST("register", handlers.Register)
