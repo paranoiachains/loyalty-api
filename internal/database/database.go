@@ -7,7 +7,6 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/paranoiachains/loyalty-api/internal/auth"
 	"github.com/paranoiachains/loyalty-api/internal/logger"
 	"github.com/paranoiachains/loyalty-api/internal/models"
 	"go.uber.org/zap"
@@ -20,21 +19,12 @@ var ErrUniqueUsername = errors.New("username already exists")
 var DB Storage
 
 type Storage interface {
-	Update() error
-	Return() error
-	CreateUser(ctx context.Context, creds auth.Credentials) (*models.User, error)
+	CreateUser(ctx context.Context, username, password string) (*models.User, error)
+	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 }
 
 type PostgresStorage struct {
 	*sql.DB
-}
-
-func (db PostgresStorage) Update() error {
-	return nil
-}
-
-func (db PostgresStorage) Return() error {
-	return nil
 }
 
 func Connect(databaseURI string) error {
@@ -53,14 +43,14 @@ func Connect(databaseURI string) error {
 	return nil
 }
 
-func (db PostgresStorage) CreateUser(ctx context.Context, creds auth.Credentials) (*models.User, error) {
+func (db PostgresStorage) CreateUser(ctx context.Context, username, password string) (*models.User, error) {
 	logger.Log.Info("creating user...")
 	query := `
 	INSERT INTO users (username, password, balance, withdrawn)
 	VALUES ($1, $2, $3, $4)`
 
 	// bcrypt encryption of password
-	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(creds.Password), 12)
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +64,7 @@ func (db PostgresStorage) CreateUser(ctx context.Context, creds auth.Credentials
 	}()
 
 	// creating user
-	_, err = tx.ExecContext(ctx, query, creds.Username, encryptedPassword, 0, 0)
+	_, err = tx.ExecContext(ctx, query, username, encryptedPassword, 0, 0)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		// if username already taken
@@ -86,7 +76,7 @@ func (db PostgresStorage) CreateUser(ctx context.Context, creds auth.Credentials
 
 	// also return user model
 	var user models.User
-	row := tx.QueryRowContext(ctx, "SELECT * FROM users WHERE username=$1", creds.Username)
+	row := tx.QueryRowContext(ctx, "SELECT * FROM users WHERE username=$1", username)
 	err = row.Scan(&user.UserID, &user.Username, &user.Password, &user.Balance, &user.Withdrawn)
 	if err != nil {
 		return nil, err
@@ -96,5 +86,21 @@ func (db PostgresStorage) CreateUser(ctx context.Context, creds auth.Credentials
 		return nil, err
 	}
 	logger.Log.Info("user successfully created!")
+	return &user, nil
+}
+
+func (db PostgresStorage) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+	logger.Log.Info("retrieving user by username from db...")
+	query := `SELECT user_id, username, password, balance, withdrawn FROM users WHERE username=$1`
+
+	var user models.User
+	err := db.QueryRowContext(ctx, query, username).Scan(
+		&user.UserID, &user.Username, &user.Password, &user.Balance, &user.Withdrawn,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Log.Info("user successfully retrieved from db!")
 	return &user, nil
 }
