@@ -11,13 +11,13 @@ import (
 
 var (
 	RunAddress           string
-	DatabaseURI          string
+	DatabaseDSN          string
 	AccrualSystemAddress string
 )
 
 type Environment struct {
 	RunAddress           string `env:"RUN_ADDRESS"`
-	DatabaseURI          string `env:"DATABASE_URI"`
+	DatabaseDSN          string `env:"DB_DSN"`
 	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 }
 
@@ -31,8 +31,8 @@ func init() {
 	// parse variables only once
 	var once sync.Once
 	once.Do(func() {
-		accruals.StringVar(&RunAddress, "a", "localhost:8080", "service address and port")
-		accruals.StringVar(&DatabaseURI, "d", "postgresql://postgres:postgres@localhost/postgres?sslmode=disable", "database connection uri")
+		accruals.StringVar(&RunAddress, "a", ":8080", "service address and port")
+		accruals.StringVar(&DatabaseDSN, "d", "postgresql://postgres:postgres@postgres/postgres?sslmode=disable", "database connection uri")
 		accruals.StringVar(&AccrualSystemAddress, "r", "", "accrual system address")
 		accruals.Parse(os.Args[1:])
 
@@ -45,8 +45,8 @@ func init() {
 		if parsedEnv.RunAddress != "" {
 			RunAddress = parsedEnv.RunAddress
 		}
-		if parsedEnv.DatabaseURI != "" {
-			DatabaseURI = parsedEnv.DatabaseURI
+		if parsedEnv.DatabaseDSN != "" {
+			DatabaseDSN = parsedEnv.DatabaseDSN
 		}
 		if parsedEnv.AccrualSystemAddress != "" {
 			AccrualSystemAddress = parsedEnv.AccrualSystemAddress

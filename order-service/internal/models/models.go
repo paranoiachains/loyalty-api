@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	UserID    int     `json:"user_id"`
@@ -10,8 +12,8 @@ type User struct {
 	Withdrawn float64 `json:"withdrawn"`
 }
 
-type Accural struct {
-	AccuralOrderID int       `json:"accural_order_id"`
+type Accrual struct {
+	AccrualOrderID int       `json:"accural_order_id"`
 	UserID         int       `json:"user_id"`
 	Status         string    `json:"status"`
 	Accural        float64   `json:"accural"`

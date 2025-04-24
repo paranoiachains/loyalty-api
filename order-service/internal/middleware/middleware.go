@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/paranoiachains/loyalty-api/internal/auth"
-	"github.com/paranoiachains/loyalty-api/internal/logger"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/auth"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/logger"
 	"go.uber.org/zap"
 )
 

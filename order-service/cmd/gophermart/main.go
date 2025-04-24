@@ -4,10 +4,12 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/paranoiachains/loyalty-api/internal/database"
-	"github.com/paranoiachains/loyalty-api/internal/flags"
-	"github.com/paranoiachains/loyalty-api/internal/handlers"
-	"github.com/paranoiachains/loyalty-api/internal/middleware"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/flags"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/handlers"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/logger"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/middleware"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -17,7 +19,8 @@ func main() {
 	// connect to db only once
 	var once sync.Once
 	once.Do(func() {
-		err := database.Connect(flags.DatabaseURI)
+		logger.Log.Debug("DB connection", zap.String("DSN", flags.DatabaseDSN))
+		err := database.ConnectToPostgres(flags.DatabaseDSN)
 		if err != nil {
 			panic(err)
 		}
