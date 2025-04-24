@@ -1,7 +1,6 @@
 FROM golang:1.24.2 AS builder
 WORKDIR /app
 
-# Копируем только нужный сервис
 COPY . .
 
 WORKDIR /app/loyalty-service/cmd
