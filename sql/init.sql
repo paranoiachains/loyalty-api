@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
 user_id SERIAL PRIMARY KEY,
 username TEXT UNIQUE NOT NULL,
 password TEXT NOT NULL,
@@ -6,7 +6,7 @@ balance NUMERIC(10, 2) DEFAULT 0 CHECK (balance >= 0),
 withdrawn NUMERIC(10, 2) DEFAULT 0 CHECK (withdrawn >= 0)
 );
 
-CREATE TABLE accruals (
+CREATE TABLE IF NOT EXISTS accruals (
 accrual_order_id BIGINT PRIMARY KEY,
 user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 status TEXT NOT NULL,
@@ -14,7 +14,7 @@ accrual NUMERIC(10, 2) DEFAULT 0 CHECK (accrual >= 0),
 uploaded_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE withdrawals (
+CREATE TABLE IF NOT EXISTS withdrawals (
 order_id BIGINT PRIMARY KEY,
 user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 sum NUMERIC(10, 2) NOT NULL CHECK (sum > 0),
