@@ -32,7 +32,7 @@ func init() {
 	var once sync.Once
 	once.Do(func() {
 		accruals.StringVar(&RunAddress, "a", ":8080", "service address and port")
-		accruals.StringVar(&DatabaseDSN, "d", "postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable", "database connection uri")
+		accruals.StringVar(&DatabaseDSN, "d", "postgresql://postgres:postgres@postgres/postgres?sslmode=disable", "database connection uri")
 		accruals.StringVar(&AccrualSystemAddress, "r", "", "accrual system address")
 		accruals.Parse(os.Args[1:])
 

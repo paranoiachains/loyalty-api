@@ -7,7 +7,9 @@ import (
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/flags"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/handlers"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/logger"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/middleware"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -17,6 +19,7 @@ func main() {
 	// connect to db only once
 	var once sync.Once
 	once.Do(func() {
+		logger.Log.Debug("DB connection", zap.String("DSN", flags.DatabaseDSN))
 		err := database.ConnectToPostgres(flags.DatabaseDSN)
 		if err != nil {
 			panic(err)
