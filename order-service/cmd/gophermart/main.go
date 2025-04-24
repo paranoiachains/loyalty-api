@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +17,7 @@ func main() {
 	// connect to db only once
 	var once sync.Once
 	once.Do(func() {
-		err := database.ConnectToPostgres(os.Getenv("DB_DSN"))
+		err := database.ConnectToPostgres(flags.DatabaseDSN)
 		if err != nil {
 			panic(err)
 		}
