@@ -49,6 +49,10 @@ jobs:
         run: |
           (cd order-service/cmd/gophermart && go build -buildvcs=false -o gophermart)
           (cd order-service/cmd/accrual && chmod +x accrual_linux_amd64)
+        
+      - name: Init DB schema
+        run: |
+          PGPASSWORD=postgres psql -h postgres -U postgres -d praktikum -f sql/init.sql
 
       - name: Test
         env:
