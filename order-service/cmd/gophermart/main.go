@@ -7,6 +7,7 @@ import (
 	"github.com/paranoiachains/loyalty-api/order-service/internal/auth"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/handlers"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/kafka"
 	"github.com/paranoiachains/loyalty-api/pkg/flags"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/pkg/middleware"
@@ -27,6 +28,8 @@ func main() {
 			panic(err)
 		}
 	})
+
+	kafka.StartKafkaServices(kafka.Messages, kafka.Output)
 
 	r.POST("/api/user/register", handlers.Register)
 	r.POST("/api/user/login", handlers.Login)
