@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/logger"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/models"
+	"github.com/paranoiachains/loyalty-api/pkg/logger"
+	"github.com/paranoiachains/loyalty-api/pkg/models"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )

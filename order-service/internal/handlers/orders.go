@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/auth"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/logger"
+	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"go.uber.org/zap"
 )
 

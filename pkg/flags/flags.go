@@ -33,7 +33,7 @@ func init() {
 	once.Do(func() {
 		accruals.StringVar(&RunAddress, "a", ":8080", "service address and port")
 		accruals.StringVar(&DatabaseDSN, "d", "postgresql://postgres:postgres@postgres/postgres?sslmode=disable", "database connection uri")
-		accruals.StringVar(&AccrualSystemAddress, "r", "", "accrual system address")
+		accruals.StringVar(&AccrualSystemAddress, "r", ":8080", "accrual system address")
 		accruals.Parse(os.Args[1:])
 
 		err := env.Parse(&parsedEnv)
