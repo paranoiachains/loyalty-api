@@ -39,6 +39,7 @@ func BuildJWTString(userID int) (string, error) {
 	return tokenString, nil
 }
 
+// returns -1 if token is not valid, otherwise returns userID
 func GetUserID(tokenString string) int {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims,
@@ -55,6 +56,7 @@ func GetUserID(tokenString string) int {
 	return claims.UserID
 }
 
+// pass cookies to user
 func SetCookies(c *gin.Context, userID int) error {
 	logger.Log.Info("setting cookies for client...")
 	token, err := BuildJWTString(userID)

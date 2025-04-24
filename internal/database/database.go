@@ -13,7 +13,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// if username already exists in db
 var ErrUniqueUsername = errors.New("username already exists")
+
+var ErrAlreadyExists = errors.New("accrual for this order already exists for the same user")
+var ErrAnotherUser = errors.New("accrual for this order was already uploaded by other user")
 
 // our database variable we will use throughout the process
 var DB Storage
@@ -21,13 +25,15 @@ var DB Storage
 type Storage interface {
 	CreateUser(ctx context.Context, username, password string) (*models.User, error)
 	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
+	CreateAccrual(ctx context.Context, accrualOrderID int, userID int) error
 }
 
 type PostgresStorage struct {
 	*sql.DB
 }
 
-func Connect(databaseURI string) error {
+// sets an interface value to PostgresStorage
+func ConnectToPostgres(databaseURI string) error {
 	logger.Log.Info("connecting to db...")
 	db, err := sql.Open("pgx", databaseURI)
 	if err != nil {
@@ -43,6 +49,7 @@ func Connect(databaseURI string) error {
 	return nil
 }
 
+// creates user, returns user model
 func (db PostgresStorage) CreateUser(ctx context.Context, username, password string) (*models.User, error) {
 	logger.Log.Info("creating user...")
 	query := `
@@ -55,16 +62,8 @@ func (db PostgresStorage) CreateUser(ctx context.Context, username, password str
 		return nil, err
 	}
 
-	tx, err := db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
-
 	// creating user
-	_, err = tx.ExecContext(ctx, query, username, encryptedPassword, 0, 0)
+	_, err = db.ExecContext(ctx, query, username, encryptedPassword, 0, 0)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		// if username already taken
@@ -76,19 +75,17 @@ func (db PostgresStorage) CreateUser(ctx context.Context, username, password str
 
 	// also return user model
 	var user models.User
-	row := tx.QueryRowContext(ctx, "SELECT * FROM users WHERE username=$1", username)
+	row := db.QueryRowContext(ctx, "SELECT * FROM users WHERE username=$1", username)
 	err = row.Scan(&user.UserID, &user.Username, &user.Password, &user.Balance, &user.Withdrawn)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
 	logger.Log.Info("user successfully created!")
 	return &user, nil
 }
 
+// return user model
 func (db PostgresStorage) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	logger.Log.Info("retrieving user by username from db...")
 	query := `SELECT user_id, username, password, balance, withdrawn FROM users WHERE username=$1`
@@ -103,4 +100,37 @@ func (db PostgresStorage) GetUserByUsername(ctx context.Context, username string
 
 	logger.Log.Info("user successfully retrieved from db!")
 	return &user, nil
+}
+
+func (db PostgresStorage) CreateAccrual(ctx context.Context, accrualOrderID int, userID int) error {
+	logger.Log.Info("checking existing accrual...")
+
+	var existingUserID int
+	err := db.QueryRowContext(ctx, `
+		SELECT user_id FROM accruals WHERE accrual_order_id = $1
+	`, accrualOrderID).Scan(&existingUserID)
+
+	if err == nil {
+		if existingUserID == userID {
+			return ErrAlreadyExists
+		}
+		return ErrAnotherUser
+	}
+	if err != sql.ErrNoRows {
+		logger.Log.Debug("retrieve user from db", zap.Error(err))
+		return err
+	}
+
+	logger.Log.Info("creating accrual...")
+	query := `
+		INSERT INTO accruals (accrual_order_id, user_id, status)
+		VALUES ($1, $2, $3)
+	`
+
+	_, err = db.ExecContext(ctx, query, accrualOrderID, userID, "NEW")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

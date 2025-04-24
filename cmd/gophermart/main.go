@@ -17,7 +17,7 @@ func main() {
 	// connect to db only once
 	var once sync.Once
 	once.Do(func() {
-		err := database.Connect(flags.DatabaseURI)
+		err := database.ConnectToPostgres(flags.DatabaseURI)
 		if err != nil {
 			panic(err)
 		}

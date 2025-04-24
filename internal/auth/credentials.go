@@ -15,7 +15,7 @@ type Credentials struct {
 	Password string `json:"password"`
 }
 
-// returns nil, nil if hash comparison went wrong
+// returns (nil, nil) if hash comparison went wrong
 func (c Credentials) Authenticate() (*models.User, error) {
 	user, err := database.DB.GetUserByUsername(context.Background(), c.Username)
 	if err != nil {
