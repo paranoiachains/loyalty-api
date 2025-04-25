@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/auth"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/kafka"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
+	"github.com/paranoiachains/loyalty-api/pkg/messaging"
 	"github.com/paranoiachains/loyalty-api/pkg/models"
 	"go.uber.org/zap"
 )
@@ -86,7 +86,7 @@ func LoadOrder(c *gin.Context) {
 		return
 	}
 
-	kafka.Messages <- data
+	messaging.OrderKafka.Send(data)
 }
 
 func GetOrder(c *gin.Context) {
