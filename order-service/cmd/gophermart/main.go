@@ -1,14 +1,18 @@
 package main
 
 import (
+	"context"
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/auth"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/flags"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/handlers"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/logger"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/middleware"
+	"github.com/paranoiachains/loyalty-api/pkg/flags"
+	"github.com/paranoiachains/loyalty-api/pkg/logger"
+	"github.com/paranoiachains/loyalty-api/pkg/messaging"
+	"github.com/paranoiachains/loyalty-api/pkg/middleware"
+
 	"go.uber.org/zap"
 )
 
@@ -26,11 +30,16 @@ func main() {
 		}
 	})
 
+	// start kafka services
+	messaging.OrderKafka = messaging.InitOrderKafka()
+	messaging.OrderKafka.Start(context.Background())
+	messaging.OrderKafka.Send([]byte{1, 0, 1, 0})
+
 	r.POST("/api/user/register", handlers.Register)
 	r.POST("/api/user/login", handlers.Login)
 
 	authGroup := r.Group("/")
-	authGroup.Use(middleware.Auth())
+	authGroup.Use(auth.Auth())
 	{
 		authGroup.POST("/api/user/orders", handlers.LoadOrder)
 		authGroup.GET("/api/user/orders", handlers.GetOrder)

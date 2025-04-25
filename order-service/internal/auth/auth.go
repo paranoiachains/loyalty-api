@@ -1,12 +1,13 @@
 package auth
 
 import (
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/logger"
+	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -74,4 +75,24 @@ func SetCookies(c *gin.Context, userID int) error {
 	)
 	logger.Log.Info("cookies are set!")
 	return nil
+}
+
+// TEMPORARY CHOICE to store it here
+func Auth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenString, err := c.Cookie("jwt_token")
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		userID := GetUserID(tokenString)
+		if userID == -1 {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		c.Set("userID", userID)
+
+		c.Next()
+	}
 }

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"strconv"
@@ -9,7 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/auth"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/logger"
+	"github.com/paranoiachains/loyalty-api/pkg/logger"
+	"github.com/paranoiachains/loyalty-api/pkg/messaging"
+	"github.com/paranoiachains/loyalty-api/pkg/models"
 	"go.uber.org/zap"
 )
 
@@ -68,8 +71,22 @@ func LoadOrder(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+
 	c.String(http.StatusAccepted, "accrual instance created!")
 
+	order := models.Accrual{
+		UserID:         userID,
+		AccrualOrderID: accrualOrderID,
+	}
+
+	data, err := json.Marshal(&order)
+	if err != nil {
+		logger.Log.Error("marshal accrual struct", zap.Error(err))
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	messaging.OrderKafka.Send(data)
 }
 
 func GetOrder(c *gin.Context) {
