@@ -9,6 +9,8 @@ import (
 	"github.com/paranoiachains/loyalty-api/order-service/internal/handlers"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/process"
 	"github.com/paranoiachains/loyalty-api/pkg/app"
+	"github.com/paranoiachains/loyalty-api/pkg/logger"
+	"go.uber.org/zap"
 
 	"github.com/paranoiachains/loyalty-api/pkg/flags"
 	"github.com/paranoiachains/loyalty-api/pkg/messaging"
@@ -21,6 +23,7 @@ func main() {
 
 	var orderApp *app.App
 
+	logger.Log.Debug("DSN", zap.String("postgres", flags.DatabaseDSN))
 	db, err := database.Connect(flags.DatabaseDSN)
 	if err != nil {
 		panic(err)
