@@ -18,7 +18,7 @@ import (
 func main() {
 	var loyaltyApp *app.App
 
-	logger.Log.Debug("DSN", zap.String("postgres", flags.DatabaseDSN))
+	logger.Log.Debug("DSN", zap.String("postgres", flags.LoyaltyDatabaseDSN))
 	db, err := database.Connect(flags.LoyaltyDatabaseDSN)
 	if err != nil {
 		panic(err)

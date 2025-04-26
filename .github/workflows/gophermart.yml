@@ -108,16 +108,18 @@ jobs:
 
       - name: Test
         env:
-          ORDER_DB_DSN: postgresql://postgres:postgres@order_service/order_service?sslmode=disable
-          LOYALTY_DB_DSN: postgresql://postgres:postgres@loyalty_service/loyalty_service?sslmode=disable
+          DB_DSN: postgresql://postgres:postgres@order_service/order_service?sslmode=disable
+          ACCRUAL_DB_DSN: postgresql://postgres:postgres@loyalty_service/loyalty_service?sslmode=disable
         run: |
+          echo "Using DB_DSN: $DB_DSN"
+          echo "Using ACCRUAL_DB_DSN: $ACCRUAL_DB_DSN"
           gophermarttest \
             -test.v -test.run=^TestGophermart$ \
             -gophermart-binary-path=$GITHUB_WORKSPACE/bin/gophermart \
             -gophermart-host=localhost \
             -gophermart-port=8080 \
-            -gophermart-database-uri="$ORDER_DB_DSN" \
-            -accrual-binary-path=$GITHUB_WORKSPACE/bin/accrual_linux_amd64 \
+            -gophermart-database-uri="$DB_DSN" \
+            -accrual-binary-path=$GITHUB_WORKSPACE/bin/loyalty \
             -accrual-host=localhost \
-            -accrual-port=$(random unused-port) \
-            -accrual-database-uri="$LOYALTY_DB_DSN"
+            -accrual-port=8080 \
+            -accrual-database-uri="$ACCRUAL_DB_DSN"
