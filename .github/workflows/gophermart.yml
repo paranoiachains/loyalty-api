@@ -96,7 +96,9 @@ jobs:
 
       - name: Test
         env:
-          DB_DSN: postgresql://postgres:postgres@postgres/order_service?sslmode=disable
+          DB_DSN: postgresql://postgres:postgres@order_service/order_service?sslmode=disable
+          ACCRUAL_DB_DSN: postgresql://postgres:postgres@loyalty_service/order_service?sslmode=disable
+
         run: |
           gophermarttest \
             -test.v -test.run=^TestGophermart$ \
