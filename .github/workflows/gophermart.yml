@@ -15,16 +15,45 @@ jobs:
     container: golang:1.23
 
     services:
-      postgres:
+      order_service:
         image: postgres
         env:
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: praktikum
+          POSTGRES_DB: order_service
         options: >-
           --health-cmd pg_isready
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
+      loyalty_service:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: loyalty_service
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      zookeeper:
+      image: confluentinc/cp-zookeeper:7.4.0
+      env:
+        ZOOKEEPER_CLIENT_PORT: 2181
+        ZOOKEEPER_TICK_TIME: 2000
+
+      kafka:
+        image: confluentinc/cp-kafka:7.4.0
+        env:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        options: >-
+          --health-cmd "cub kafka-ready -b kafka:9092 1 20"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - name: Checkout code
@@ -49,13 +78,20 @@ jobs:
         run: |
           (cd order-service/cmd/gophermart && go build -buildvcs=false -o gophermart)
           (cd order-service/cmd/accrual && chmod +x accrual_linux_amd64)
+          (cd loyalty-service/cmd/ && go build -buildvcs=false -o loyalty)
+      - name: Start services
+        run: |
+          gophermart &
+          loyalty &
+          sleep 5
         
       - name: Install PostgreSQL client
         run: apt-get update && apt-get install -y postgresql-client
 
       - name: Init DB schema
         run: |
-          PGPASSWORD=postgres psql -h postgres -U postgres -d praktikum -f sql/init.sql
+          PGPASSWORD=postgres psql -h postgres -U postgres -d order_service -f sql/init_order.sql
+          PGPASSWORD=postgres psql -h postgres -U postgres -d loyalty_service sql/init_loyalty.sql
 
       - name: Test
         env:

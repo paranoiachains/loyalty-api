@@ -104,7 +104,7 @@ func (db LoyaltyStorage) GetOrders(ctx context.Context, userID int) ([]models.Ac
 	return nil, nil
 }
 
-func (db LoyaltyStorage) GetOrder(ctx context.Context, accrualOrderId int) (*models.Accrual, error) {
+func (db LoyaltyStorage) GetOrder(ctx context.Context, accrualOrderID int) (*models.Accrual, error) {
 	query := `
 	SELECT order_id, status, accrual
 	FROM orders
@@ -112,7 +112,7 @@ func (db LoyaltyStorage) GetOrder(ctx context.Context, accrualOrderId int) (*mod
 	`
 
 	var order models.Accrual
-	row := db.QueryRowContext(ctx, query, accrualOrderId)
+	row := db.QueryRowContext(ctx, query, accrualOrderID)
 	err := row.Scan(&order.AccrualOrderID, &order.Status, &order.Accrual)
 	if err != nil {
 		logger.Log.Error("get order", zap.Error(err))
