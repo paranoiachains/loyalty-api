@@ -79,6 +79,7 @@ jobs:
           (cd order-service/cmd/gophermart && go build -buildvcs=false -o gophermart)
           (cd order-service/cmd/accrual && chmod +x accrual_linux_amd64)
           (cd loyalty-service/cmd/ && go build -buildvcs=false -o loyalty)
+
       - name: Start services
         run: |
           gophermart &
@@ -91,7 +92,7 @@ jobs:
       - name: Init DB schema
         run: |
           PGPASSWORD=postgres psql -h postgres -U postgres -d order_service -f sql/init_order.sql
-          PGPASSWORD=postgres psql -h postgres -U postgres -d loyalty_service sql/init_loyalty.sql
+          PGPASSWORD=postgres psql -h postgres -U postgres -d loyalty_service -f sql/init_loyalty.sql
 
       - name: Test
         env:
