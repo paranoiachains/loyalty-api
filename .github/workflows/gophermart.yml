@@ -1,3 +1,9 @@
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -67,9 +73,9 @@ jobs:
       - name: Prepare binaries
         run: |
           mkdir -p ./bin
-          (cd order-service/cmd/gophermart && go build -buildvcs=false -o ../../bin/gophermart)
-          (cd order-service/cmd/accrual && chmod +x accrual_linux_amd64 && cp accrual_linux_amd64 ../../bin/)
-          (cd loyalty-service/cmd && go build -buildvcs=false -o ../../bin/loyalty)
+          (cd order-service/cmd/gophermart && go build -buildvcs=false -o $GITHUB_WORKSPACE/bin/gophermart)
+          (cd order-service/cmd/accrual && chmod +x accrual_linux_amd64 && cp accrual_linux_amd64 $GITHUB_WORKSPACE/bin/)
+          (cd loyalty-service/cmd && go build -buildvcs=false -o $GITHUB_WORKSPACE/bin/loyalty)
 
       - name: Install PostgreSQL client
         run: apt-get update && apt-get install -y postgresql-client
