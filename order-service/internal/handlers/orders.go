@@ -88,11 +88,35 @@ func LoadOrder(app *app.App) gin.HandlerFunc {
 			return
 		}
 
-		logger.Log.Info("sending data to kafka", zap.String("data", string(data)))
 		app.Kafka.Send(data)
 	}
 }
 
-func GetOrder(c *gin.Context) {
+func GetOrders(app *app.App) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// get jwt token
+		token, err := c.Cookie("jwt_token")
+		if err != nil {
+			logger.Log.Error("get cookie", zap.Error(err))
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
 
+		// retrieve userID from token
+		userID := auth.GetUserID(token)
+		if userID == -1 {
+			logger.Log.Error("token is not valid")
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		orders, err := app.DB.GetOrders(context.Background(), userID)
+		if err != nil {
+			logger.Log.Error("get orders", zap.Error(err))
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		c.JSON(http.StatusOK, orders)
+	}
 }

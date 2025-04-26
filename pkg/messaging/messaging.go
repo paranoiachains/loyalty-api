@@ -2,7 +2,6 @@ package messaging
 
 import (
 	"context"
-	"time"
 
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/segmentio/kafka-go"
@@ -12,67 +11,46 @@ import (
 type KafkaService struct {
 	reader    *kafka.Reader
 	writer    *kafka.Writer
-	input     chan []byte
-	processed chan []byte
+	consumeCh chan []byte
+	produceCh chan []byte
 }
 
-// functional options parameter
-type Option func(*KafkaService)
-
-func WithReader(reader *kafka.Reader) Option {
-	return func(k *KafkaService) {
-		k.reader = reader
-	}
+type MessageBroker interface {
+	Send(msg []byte)
+	Receive() <-chan []byte
 }
 
-func WithWriter(writer *kafka.Writer) Option {
-	return func(k *KafkaService) {
-		k.writer = writer
+func NewKafkaService(reader *kafka.Reader, writer *kafka.Writer) *KafkaService {
+	return &KafkaService{
+		reader:    reader,
+		writer:    writer,
+		consumeCh: make(chan []byte, 10),
+		produceCh: make(chan []byte, 10),
 	}
-}
-
-func WithInputChannel(ch chan []byte) Option {
-	return func(k *KafkaService) {
-		k.input = ch
-	}
-}
-
-func WithProcessedChannel(ch chan []byte) Option {
-	return func(k *KafkaService) {
-		k.processed = ch
-	}
-}
-
-func NewKafkaService(opts ...Option) *KafkaService {
-	k := &KafkaService{}
-	for _, opt := range opts {
-		opt(k)
-	}
-	return k
 }
 
 func (k *KafkaService) Start(ctx context.Context) {
-	if k.reader != nil && k.processed != nil {
+	if k.reader != nil {
 		go k.consumer(ctx)
-		logger.Log.Info("consumer started!")
 	}
-	if k.writer != nil && k.input != nil {
+	if k.writer != nil {
 		go k.producer(ctx)
-		logger.Log.Info("producer started!")
 	}
 }
 
 func (k *KafkaService) Send(msg []byte) {
-	k.processed <- msg
+	k.produceCh <- msg
 }
 
 func (k *KafkaService) Receive() <-chan []byte {
-	return k.input
+	return k.consumeCh
 }
 
 func (k *KafkaService) producer(ctx context.Context) {
+	logger.Log.Info("producer started!")
 	for {
-		msg := <-k.input
+		logger.Log.Info("waiting for msg...")
+		msg := <-k.produceCh
 		logger.Log.Info("kafka", zap.ByteString("got message from messages channel, sending to kafka", msg))
 
 		err := k.writer.WriteMessages(
@@ -83,14 +61,13 @@ func (k *KafkaService) producer(ctx context.Context) {
 		)
 		if err != nil {
 			logger.Log.Error("send message to kafka", zap.Error(err))
-		} else {
-			logger.Log.Info("sent message to kafka")
 		}
+		logger.Log.Info("sent message to kafka")
 	}
 }
 
 func (k *KafkaService) consumer(ctx context.Context) {
-	time.Sleep(15 * time.Second)
+	logger.Log.Info("consumer started!")
 	for {
 		m, err := k.reader.ReadMessage(ctx)
 		if err != nil {
@@ -98,7 +75,7 @@ func (k *KafkaService) consumer(ctx context.Context) {
 			break
 		}
 		logger.Log.Info("got message from kafka", zap.ByteString("message", m.Value))
-		k.processed <- m.Value
+		k.consumeCh <- m.Value
 	}
 	if err := k.reader.Close(); err != nil {
 		logger.Log.Error("close reader", zap.Error(err))
@@ -122,28 +99,16 @@ func CreateReader(broker string, topic string) *kafka.Reader {
 	})
 }
 
-var OrderKafka *KafkaService
-
 func InitOrderKafka() *KafkaService {
-	writer := CreateWriter("kafka:9092", "order-created")
-	reader := CreateReader("kafka:9092", "order-completed")
-
 	return NewKafkaService(
-		WithReader(reader),
-		WithWriter(writer),
-		WithInputChannel(make(chan []byte, 1)),
-		WithProcessedChannel(make(chan []byte, 1)),
+		CreateReader("kafka:9092", "order-completed"),
+		CreateWriter("kafka:9092", "order-created"),
 	)
 }
 
 func InitLoyaltyKafka() *KafkaService {
-	writer := CreateWriter("kafka:9092", "order-completed")
-	reader := CreateReader("kafka:9092", "order-created")
-
 	return NewKafkaService(
-		WithReader(reader),
-		WithWriter(writer),
-		WithInputChannel(make(chan []byte, 1)),
-		WithProcessedChannel(make(chan []byte, 1)),
+		CreateReader("kafka:9092", "order-created"),
+		CreateWriter("kafka:9092", "order-completed"),
 	)
 }
