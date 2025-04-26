@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
+	"github.com/paranoiachains/loyalty-api/pkg/database"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/pkg/models"
 	"go.uber.org/zap"
@@ -16,8 +16,8 @@ type Credentials struct {
 }
 
 // returns (nil, nil) if hash comparison went wrong
-func (c Credentials) Authenticate() (*models.User, error) {
-	user, err := database.DB.GetUserByUsername(context.Background(), c.Username)
+func (c Credentials) Authenticate(ctx context.Context, db database.Storage) (*models.User, error) {
+	user, err := db.GetUserByUsername(ctx, c.Username)
 	if err != nil {
 		return nil, err
 	}
