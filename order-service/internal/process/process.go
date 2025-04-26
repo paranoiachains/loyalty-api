@@ -12,25 +12,60 @@ import (
 )
 
 type OrderProcessor struct {
-	DB     database.Storage
-	Broker messaging.MessageBroker
+	DB           database.Storage
+	Broker       messaging.MessageBroker
+	StatusBroker messaging.MessageBroker
 }
 
 func (p OrderProcessor) Process(ctx context.Context) {
 	logger.Log.Info("processor started!")
-	for data := range p.Broker.Receive() {
-		var order models.Accrual
-		logger.Log.Info("unmarshalling order...")
-		err := json.Unmarshal(data, &order)
-		if err != nil {
-			logger.Log.Error("unmarshal order", zap.Error(err))
-			continue
-		}
 
-		err = p.DB.UpdateAccrual(ctx, order.AccrualOrderID, order.Accrual)
-		if err != nil {
-			logger.Log.Error("update accrual", zap.Error(err))
-			continue
+	brokerCh := p.Broker.Receive()
+	statusCh := p.StatusBroker.Receive()
+
+	for {
+		select {
+		case data, ok := <-brokerCh:
+			if !ok {
+				logger.Log.Warn("broker channel closed")
+				return
+			}
+			var order models.Accrual
+			logger.Log.Info("unmarshalling order...")
+			err := json.Unmarshal(data, &order)
+			if err != nil {
+				logger.Log.Error("unmarshal order", zap.Error(err))
+				continue
+			}
+
+			err = p.DB.UpdateAccrual(ctx, order.AccrualOrderID, order.Accrual)
+			if err != nil {
+				logger.Log.Error("update accrual", zap.Error(err))
+				continue
+			}
+		case data, ok := <-statusCh:
+			if !ok {
+				logger.Log.Warn("status broker channel closed")
+				return
+			}
+			var statusUpdate models.AccrualStatusUpdate
+			logger.Log.Info("unmarshalling status update...")
+			err := json.Unmarshal(data, &statusUpdate)
+			if err != nil {
+				logger.Log.Error("unmarshal status update", zap.Error(err))
+				continue
+			}
+
+			logger.Log.Info("status update received",
+				zap.Int("order_id", statusUpdate.OrderID),
+				zap.String("status", statusUpdate.Status),
+			)
+
+			err = p.DB.SetStatus(ctx, statusUpdate.OrderID, statusUpdate.Status)
+			if err != nil {
+				logger.Log.Error("set status", zap.Error(err))
+				continue
+			}
 		}
 	}
 }

@@ -20,6 +20,11 @@ type Accrual struct {
 	UploadTime     time.Time `json:"uploaded_at"`
 }
 
+type AccrualStatusUpdate struct {
+	OrderID int    `json:"accrual_order_id"`
+	Status  string `json:"status"`
+}
+
 type Withdrawal struct {
 	OrderID       int       `json:"order_id"`
 	UserID        int       `json:"user_id"`

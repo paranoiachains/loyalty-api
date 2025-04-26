@@ -8,9 +8,10 @@ import (
 )
 
 type App struct {
-	Kafka     *messaging.KafkaService
-	DB        database.Storage
-	Processor MessageProcessor
+	Kafka       *messaging.KafkaService
+	DB          database.Storage
+	Processor   MessageProcessor
+	StatusKafka *messaging.KafkaService
 }
 
 type MessageProcessor interface {

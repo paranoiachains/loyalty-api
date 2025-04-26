@@ -30,10 +30,10 @@ func NewKafkaService(reader *kafka.Reader, writer *kafka.Writer) *KafkaService {
 }
 
 func (k *KafkaService) Start(ctx context.Context) {
-	if k.reader != nil {
+	if k.reader != nil && k.consumeCh != nil {
 		go k.consumer(ctx)
 	}
-	if k.writer != nil {
+	if k.writer != nil && k.produceCh != nil {
 		go k.producer(ctx)
 	}
 }
@@ -111,4 +111,18 @@ func InitLoyaltyKafka() *KafkaService {
 		CreateReader("kafka:9092", "order-created"),
 		CreateWriter("kafka:9092", "order-completed"),
 	)
+}
+
+func InitStatusOrder() *KafkaService {
+	return &KafkaService{
+		reader:    CreateReader("kafka:9092", "order-status"),
+		consumeCh: make(chan []byte, 10),
+	}
+}
+
+func InitStatusLoyalty() *KafkaService {
+	return &KafkaService{
+		writer:    CreateWriter("kafka:9092", "order-status"),
+		produceCh: make(chan []byte, 10),
+	}
 }

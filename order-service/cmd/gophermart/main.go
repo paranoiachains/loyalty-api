@@ -27,17 +27,22 @@ func main() {
 	}
 
 	orderKafka := messaging.InitOrderKafka()
+	orderStatusKafka := messaging.InitStatusOrder()
 
 	orderApp = &app.App{
 		DB:    db,
 		Kafka: orderKafka,
 		Processor: process.OrderProcessor{
-			DB:     db,
-			Broker: orderKafka,
+			DB:           db,
+			Broker:       orderKafka,
+			StatusBroker: orderStatusKafka,
 		},
+		StatusKafka: orderStatusKafka,
 	}
 
 	orderApp.Kafka.Start(context.Background())
+	orderApp.StatusKafka.Start(context.Background())
+
 	go orderApp.Processor.Process(context.Background())
 
 	r.POST("/api/user/register", handlers.Register(orderApp))

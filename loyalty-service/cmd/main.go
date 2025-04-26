@@ -22,21 +22,26 @@ func main() {
 	}
 
 	loyaltyKafka := messaging.InitLoyaltyKafka()
+	loyaltyStatus := messaging.InitStatusLoyalty()
 
 	loyaltyApp = &app.App{
 		DB:    db,
 		Kafka: loyaltyKafka,
 		Processor: &process.LoyaltyProcessor{
-			DB:     db,
-			Broker: loyaltyKafka,
+			DB:           db,
+			Broker:       loyaltyKafka,
+			StatusBroker: loyaltyStatus,
 		},
+		StatusKafka: loyaltyStatus,
 	}
 
 	loyaltyApp.Kafka.Start(context.Background())
+	loyaltyApp.StatusKafka.Start(context.Background())
+
 	go loyaltyApp.Processor.Process(context.Background())
 
 	r := gin.New()
-	r.Use(middleware.Compression(), middleware.Compression())
+	r.Use(middleware.Logger(), middleware.Compression())
 	r.GET("/api/orders/:number", handlers.GetOrder(loyaltyApp))
 	r.Run(flags.AccrualSystemAddress)
 }
