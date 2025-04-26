@@ -54,9 +54,11 @@ func NewKafkaService(opts ...Option) *KafkaService {
 func (k *KafkaService) Start(ctx context.Context) {
 	if k.reader != nil && k.processed != nil {
 		go k.consumer(ctx)
+		logger.Log.Info("consumer started!")
 	}
 	if k.writer != nil && k.input != nil {
 		go k.producer(ctx)
+		logger.Log.Info("producer started!")
 	}
 }
 
@@ -123,7 +125,7 @@ func CreateReader(broker string, topic string) *kafka.Reader {
 var OrderKafka *KafkaService
 
 func InitOrderKafka() *KafkaService {
-	writer := CreateWriter("kafka:9092", "order-placement")
+	writer := CreateWriter("kafka:9092", "order-created")
 	reader := CreateReader("kafka:9092", "order-completed")
 
 	return NewKafkaService(
@@ -134,11 +136,9 @@ func InitOrderKafka() *KafkaService {
 	)
 }
 
-var LoyaltyKafka *KafkaService
-
 func InitLoyaltyKafka() *KafkaService {
 	writer := CreateWriter("kafka:9092", "order-completed")
-	reader := CreateReader("kafka:9092", "order-placement")
+	reader := CreateReader("kafka:9092", "order-created")
 
 	return NewKafkaService(
 		WithReader(reader),
