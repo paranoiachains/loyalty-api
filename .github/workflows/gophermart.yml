@@ -78,7 +78,7 @@ jobs:
         run: |
           PGPASSWORD=postgres psql -h order_service -U postgres -d order_service -f sql/init_order.sql
           PGPASSWORD=postgres psql -h loyalty_service -U postgres -d loyalty_service -f sql/init_loyalty.sql
-          
+
       - name: Start services
         run: |
           ./bin/gophermart &
@@ -92,11 +92,11 @@ jobs:
         run: |
           gophermarttest \
             -test.v -test.run=^TestGophermart$ \
-            -gophermart-binary-path=bin/gophermart \
+            -gophermart-binary-path=$GITHUB_WORKSPACE/bin/gophermart \
             -gophermart-host=localhost \
             -gophermart-port=8080 \
             -gophermart-database-uri="$ORDER_DB_DSN" \
-            -accrual-binary-path=bin/accrual_linux_amd64 \
+            -accrual-binary-path=$GITHUB_WORKSPACE/bin/accrual_linux_amd64 \
             -accrual-host=localhost \
             -accrual-port=$(random unused-port) \
             -accrual-database-uri="$LOYALTY_DB_DSN"
