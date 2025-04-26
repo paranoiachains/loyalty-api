@@ -37,10 +37,10 @@ jobs:
           --health-retries 5
 
       zookeeper:
-      image: confluentinc/cp-zookeeper:7.4.0
-      env:
-        ZOOKEEPER_CLIENT_PORT: 2181
-        ZOOKEEPER_TICK_TIME: 2000
+        image: confluentinc/cp-zookeeper:7.4.0
+        env:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_TICK_TIME: 2000
 
       kafka:
         image: confluentinc/cp-kafka:7.4.0
@@ -91,12 +91,12 @@ jobs:
 
       - name: Init DB schema
         run: |
-          PGPASSWORD=postgres psql -h postgres -U postgres -d order_service -f sql/init_order.sql
-          PGPASSWORD=postgres psql -h postgres -U postgres -d loyalty_service -f sql/init_loyalty.sql
+          PGPASSWORD=postgres psql -h order_service -U postgres -d order_service -f sql/init_order.sql
+          PGPASSWORD=postgres psql -h loyalty_service -U postgres -d loyalty_service -f sql/init_loyalty.sql
 
       - name: Test
         env:
-          DB_DSN: postgresql://postgres:postgres@postgres/praktikum?sslmode=disable
+          DB_DSN: postgresql://postgres:postgres@postgres/order_service?sslmode=disable
         run: |
           gophermarttest \
             -test.v -test.run=^TestGophermart$ \
