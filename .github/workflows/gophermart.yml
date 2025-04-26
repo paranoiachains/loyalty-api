@@ -76,9 +76,9 @@ jobs:
 
       - name: Prepare binaries
         run: |
-          (cd order-service/cmd/gophermart && go build -buildvcs=false -o gophermart)
+          (cd order-service/cmd/gophermart && go build -buildvcs=false -o /usr/local/bin/gophermart)
           (cd order-service/cmd/accrual && chmod +x accrual_linux_amd64)
-          (cd loyalty-service/cmd/ && go build -buildvcs=false -o loyalty)
+          (cd loyalty-service/cmd/ && go build -buildvcs=false -o loyalty -o /usr/local/bin/loyalty)
 
       - name: Start services
         run: |
