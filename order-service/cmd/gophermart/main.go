@@ -2,47 +2,57 @@ package main
 
 import (
 	"context"
-	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/auth"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/handlers"
+	"github.com/paranoiachains/loyalty-api/order-service/internal/process"
+	"github.com/paranoiachains/loyalty-api/pkg/app"
+
 	"github.com/paranoiachains/loyalty-api/pkg/flags"
-	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/pkg/messaging"
 	"github.com/paranoiachains/loyalty-api/pkg/middleware"
-
-	"go.uber.org/zap"
 )
 
 func main() {
 	r := gin.New()
 	r.Use(gin.Recovery(), middleware.Logger(), middleware.Compression())
 
-	// connect to db only once
-	var once sync.Once
-	once.Do(func() {
-		logger.Log.Debug("DB connection", zap.String("DSN", flags.DatabaseDSN))
-		err := database.ConnectToPostgres(flags.DatabaseDSN)
-		if err != nil {
-			panic(err)
-		}
-	})
+	var orderApp *app.App
 
-	// start kafka services
-	messaging.OrderKafka = messaging.InitOrderKafka()
-	messaging.OrderKafka.Start(context.Background())
-	messaging.OrderKafka.Send([]byte{1, 0, 1, 0})
+	db, err := database.Connect(flags.DatabaseDSN)
+	if err != nil {
+		panic(err)
+	}
 
-	r.POST("/api/user/register", handlers.Register)
-	r.POST("/api/user/login", handlers.Login)
+	orderKafka := messaging.InitOrderKafka()
+	orderStatusKafka := messaging.InitStatusOrder()
+
+	orderApp = &app.App{
+		DB:    db,
+		Kafka: orderKafka,
+		Processor: process.OrderProcessor{
+			DB:           db,
+			Broker:       orderKafka,
+			StatusBroker: orderStatusKafka,
+		},
+		StatusKafka: orderStatusKafka,
+	}
+
+	orderApp.Kafka.Start(context.Background())
+	orderApp.StatusKafka.Start(context.Background())
+
+	go orderApp.Processor.Process(context.Background())
+
+	r.POST("/api/user/register", handlers.Register(orderApp))
+	r.POST("/api/user/login", handlers.Login(orderApp))
 
 	authGroup := r.Group("/")
 	authGroup.Use(auth.Auth())
 	{
-		authGroup.POST("/api/user/orders", handlers.LoadOrder)
-		authGroup.GET("/api/user/orders", handlers.GetOrder)
+		authGroup.POST("/api/user/orders", handlers.LoadOrder(orderApp))
+		authGroup.GET("/api/user/orders", handlers.GetOrders(orderApp))
 		authGroup.GET("/api/user/balance", handlers.GetBalance)
 		authGroup.POST("/api/user/balance/withdraw", handlers.RequestWithdraw)
 		authGroup.GET("/api/user/withdrawals", handlers.Withdrawals)

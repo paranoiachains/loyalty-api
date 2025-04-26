@@ -2,21 +2,46 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/paranoiachains/loyalty-api/loyalty-service/internal/database"
+	"github.com/paranoiachains/loyalty-api/loyalty-service/internal/handlers"
+	"github.com/paranoiachains/loyalty-api/loyalty-service/internal/process"
+	"github.com/paranoiachains/loyalty-api/pkg/app"
 	"github.com/paranoiachains/loyalty-api/pkg/flags"
 	"github.com/paranoiachains/loyalty-api/pkg/messaging"
+	"github.com/paranoiachains/loyalty-api/pkg/middleware"
 )
 
 func main() {
-	// init kafka services
-	messaging.LoyaltyKafka = messaging.InitLoyaltyKafka()
-	messaging.LoyaltyKafka.Start(context.Background())
-	for v := range messaging.LoyaltyKafka.Receive() {
-		fmt.Printf("%v\n", v)
+	var loyaltyApp *app.App
+
+	db, err := database.Connect(flags.LoyaltyDatabaseDSN)
+	if err != nil {
+		panic(err)
 	}
 
+	loyaltyKafka := messaging.InitLoyaltyKafka()
+	loyaltyStatus := messaging.InitStatusLoyalty()
+
+	loyaltyApp = &app.App{
+		DB:    db,
+		Kafka: loyaltyKafka,
+		Processor: &process.LoyaltyProcessor{
+			DB:           db,
+			Broker:       loyaltyKafka,
+			StatusBroker: loyaltyStatus,
+		},
+		StatusKafka: loyaltyStatus,
+	}
+
+	loyaltyApp.Kafka.Start(context.Background())
+	loyaltyApp.StatusKafka.Start(context.Background())
+
+	go loyaltyApp.Processor.Process(context.Background())
+
 	r := gin.New()
+	r.Use(middleware.Logger(), middleware.Compression())
+	r.GET("/api/orders/:number", handlers.GetOrder(loyaltyApp))
 	r.Run(flags.AccrualSystemAddress)
 }

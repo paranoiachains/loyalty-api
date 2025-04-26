@@ -12,12 +12,14 @@ import (
 var (
 	RunAddress           string
 	DatabaseDSN          string
+	LoyaltyDatabaseDSN   string
 	AccrualSystemAddress string
 )
 
 type Environment struct {
 	RunAddress           string `env:"RUN_ADDRESS"`
-	DatabaseDSN          string `env:"DB_DSN"`
+	OrderDatabaseDSN     string `env:"DB_DSN"`
+	LoyaltyDatabaseDSN   string `env:"ACCRUAL_DB_DSN"`
 	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 }
 
@@ -32,7 +34,8 @@ func init() {
 	var once sync.Once
 	once.Do(func() {
 		accruals.StringVar(&RunAddress, "a", ":8080", "service address and port")
-		accruals.StringVar(&DatabaseDSN, "d", "postgresql://postgres:postgres@postgres/postgres?sslmode=disable", "database connection uri")
+		accruals.StringVar(&DatabaseDSN, "d", "postgresql://postgres:postgres@postgres/order_service?sslmode=disable", "database connection uri")
+		accruals.StringVar(&LoyaltyDatabaseDSN, "dl", "postgresql://postgres:postgres@postgres/loyalty_service?sslmode=disable", "db connection uri")
 		accruals.StringVar(&AccrualSystemAddress, "r", ":8080", "accrual system address")
 		accruals.Parse(os.Args[1:])
 
@@ -45,8 +48,11 @@ func init() {
 		if parsedEnv.RunAddress != "" {
 			RunAddress = parsedEnv.RunAddress
 		}
-		if parsedEnv.DatabaseDSN != "" {
-			DatabaseDSN = parsedEnv.DatabaseDSN
+		if parsedEnv.OrderDatabaseDSN != "" {
+			DatabaseDSN = parsedEnv.OrderDatabaseDSN
+		}
+		if parsedEnv.LoyaltyDatabaseDSN != "" {
+			LoyaltyDatabaseDSN = parsedEnv.LoyaltyDatabaseDSN
 		}
 		if parsedEnv.AccrualSystemAddress != "" {
 			AccrualSystemAddress = parsedEnv.AccrualSystemAddress
