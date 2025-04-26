@@ -84,7 +84,7 @@ jobs:
         run: |
           PGPASSWORD=postgres psql -h order_service -U postgres -d order_service -f sql/init_order.sql
           PGPASSWORD=postgres psql -h loyalty_service -U postgres -d loyalty_service -f sql/init_loyalty.sql
-          
+
       - name: Wait for PostgreSQL
         run: |
           echo "Waiting for order_service..."
@@ -92,9 +92,17 @@ jobs:
           echo "Waiting for loyalty_service..."
           until pg_isready -h loyalty_service -p 5432 -U postgres; do sleep 1; done
 
-      - name: Start services
+      - name: Start order-service
+        env:
+          DB_DSN: postgresql://postgres:postgres@order_service/order_service?sslmode=disable
         run: |
           ./bin/gophermart &
+          sleep 5
+
+      - name: Start loyalty-service
+        env:
+          ACCRUAL_DB_DSN: postgresql://postgres:postgres@order_service/order_service?sslmode=disable
+        run: |
           ./bin/loyalty &
           sleep 5
 
