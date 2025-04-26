@@ -84,6 +84,13 @@ jobs:
         run: |
           PGPASSWORD=postgres psql -h order_service -U postgres -d order_service -f sql/init_order.sql
           PGPASSWORD=postgres psql -h loyalty_service -U postgres -d loyalty_service -f sql/init_loyalty.sql
+          
+      - name: Wait for PostgreSQL
+        run: |
+          echo "Waiting for order_service..."
+          until pg_isready -h order_service -p 5432 -U postgres; do sleep 1; done
+          echo "Waiting for loyalty_service..."
+          until pg_isready -h loyalty_service -p 5432 -U postgres; do sleep 1; done
 
       - name: Start services
         run: |
