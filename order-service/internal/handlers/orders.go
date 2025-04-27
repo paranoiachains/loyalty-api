@@ -10,7 +10,6 @@ import (
 
 	"github.com/ShiraazMoollatjie/goluhn"
 	"github.com/gin-gonic/gin"
-	"github.com/paranoiachains/loyalty-api/order-service/internal/auth"
 
 	"github.com/paranoiachains/loyalty-api/pkg/app"
 	"github.com/paranoiachains/loyalty-api/pkg/database"
@@ -20,21 +19,14 @@ import (
 
 func LoadOrder(app *app.App) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// get jwt token
-		token, err := c.Cookie("jwt_token")
-		if err != nil {
-			logger.Log.Error("get cookie", zap.Error(err))
+		value, ok := c.Get("userID")
+		if !ok {
+			logger.Log.Error("get user id gin")
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
-		// retrieve userID from token
-		userID := auth.GetUserID(token)
-		if userID == -1 {
-			logger.Log.Error("token is not valid")
-			c.AbortWithStatus(http.StatusUnauthorized)
-			return
-		}
+		userID := value.(int64)
 
 		// read body, get order id
 		body, err := io.ReadAll(c.Request.Body)
@@ -61,7 +53,7 @@ func LoadOrder(app *app.App) gin.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		order, err := app.DB.CreateAccrual(ctx, accrualOrderID, userID)
+		order, err := app.DB.CreateAccrual(ctx, accrualOrderID, int(userID))
 		if err != nil {
 			switch err {
 			case database.ErrAlreadyExists:
@@ -94,23 +86,16 @@ func LoadOrder(app *app.App) gin.HandlerFunc {
 
 func GetOrders(app *app.App) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// get jwt token
-		token, err := c.Cookie("jwt_token")
-		if err != nil {
-			logger.Log.Error("get cookie", zap.Error(err))
+		value, ok := c.Get("userID")
+		if !ok {
+			logger.Log.Error("get user id gin")
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
-		// retrieve userID from token
-		userID := auth.GetUserID(token)
-		if userID == -1 {
-			logger.Log.Error("token is not valid")
-			c.AbortWithStatus(http.StatusUnauthorized)
-			return
-		}
+		userID := value.(int64)
 
-		orders, err := app.DB.GetOrders(context.Background(), userID)
+		orders, err := app.DB.GetOrders(context.Background(), int(userID))
 		if err != nil {
 			logger.Log.Error("get orders", zap.Error(err))
 			c.AbortWithStatus(http.StatusInternalServerError)

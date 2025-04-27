@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 
+	"github.com/paranoiachains/loyalty-api/pkg/clients/sso"
 	"github.com/paranoiachains/loyalty-api/pkg/database"
 	"github.com/paranoiachains/loyalty-api/pkg/messaging"
 )
@@ -12,6 +13,7 @@ type App struct {
 	DB          database.Storage
 	Processor   MessageProcessor
 	StatusKafka *messaging.KafkaService
+	SSOClient   *sso.Client
 }
 
 type MessageProcessor interface {

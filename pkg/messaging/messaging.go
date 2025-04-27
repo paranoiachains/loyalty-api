@@ -92,10 +92,11 @@ func CreateWriter(broker string, topic string) *kafka.Writer {
 
 func CreateReader(broker string, topic string) *kafka.Reader {
 	return kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   []string{broker},
-		Topic:     topic,
-		Partition: 0,
-		MaxBytes:  10e6,
+		Brokers:     []string{broker},
+		Topic:       topic,
+		MaxBytes:    10e6,
+		StartOffset: kafka.LastOffset,
+		GroupID:     "order",
 	})
 }
 

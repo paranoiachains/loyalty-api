@@ -21,3 +21,6 @@ vendor/
 # IDEs directories
 .idea
 .vscode
+
+# ps1 helper scripts
+.ps1
