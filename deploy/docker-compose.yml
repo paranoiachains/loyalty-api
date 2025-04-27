@@ -19,6 +19,14 @@
       environment:
         - DB_DSN=postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
 
+    sso-service:
+      restart: always
+      build:
+        context: ..
+        dockerfile: deploy/sso-service.Dockerfile
+      ports:
+        - "5000:5000"
+
     postgres:
       image: postgres:14
       environment:

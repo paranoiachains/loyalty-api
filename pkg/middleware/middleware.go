@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -90,4 +91,30 @@ type gzipWriter struct {
 
 func (w *gzipWriter) Write(b []byte) (int, error) {
 	return w.writer.Write(b)
+}
+
+func Auth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenString, err := c.Cookie("jwt_token")
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		claims := &struct {
+			jwt.RegisteredClaims
+			UserID int64 `json:"user_id"`
+		}{}
+		_, err = jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+			return []byte("secret_key"), nil
+		})
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		c.Set("userID", claims.UserID)
+
+		c.Next()
+	}
 }

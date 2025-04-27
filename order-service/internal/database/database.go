@@ -154,11 +154,17 @@ func (db OrderStorage) SetStatus(ctx context.Context, accrualOrderID int, status
 }
 
 func (db OrderStorage) UpdateAccrual(ctx context.Context, accrualOrderID int, accrual float64) error {
-	query := `
+	queryAccrual := `
 	UPDATE accruals
 	SET accrual = $1
 	WHERE accrual_order_id = $2;
 	`
+	queryBalance := `
+	UPDATE users
+	SET balance = balance + $1
+	WHERE user_id = (SELECT user_id FROM accruals WHERE accrual_order_id = $2);
+	`
+
 	logger.Log.Info("updating accrual, starting tx...")
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
@@ -166,9 +172,17 @@ func (db OrderStorage) UpdateAccrual(ctx context.Context, accrualOrderID int, ac
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, query, accrual, accrualOrderID)
+	// update accrual (Accrual model)
+	_, err = tx.ExecContext(ctx, queryAccrual, accrual, accrualOrderID)
 	if err != nil {
 		logger.Log.Error("update accrual db query", zap.Error(err))
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, queryBalance, accrual, accrualOrderID)
+	if err != nil {
+		logger.Log.Error("update balance db query", zap.Error(err))
 		tx.Rollback()
 		return err
 	}
@@ -179,7 +193,7 @@ func (db OrderStorage) UpdateAccrual(ctx context.Context, accrualOrderID int, ac
 		return err
 	}
 
-	logger.Log.Info("accrual updated!")
+	logger.Log.Info("accrual and balance updated!")
 	return nil
 }
 
