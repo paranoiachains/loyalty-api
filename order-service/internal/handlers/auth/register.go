@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	auth "github.com/paranoiachains/loyalty-api/order-service/internal/handlers/auth/models"
 	"github.com/paranoiachains/loyalty-api/pkg/app"
-	"github.com/paranoiachains/loyalty-api/pkg/clients/sso"
+	sso "github.com/paranoiachains/loyalty-api/pkg/clients/sso/auth"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -23,7 +23,7 @@ func Register(a *app.App) gin.HandlerFunc {
 			return
 		}
 
-		_, err := a.SSOClient.RegisterNewUser(context.Background(), creds.Login, creds.Password)
+		_, err := a.AuthClient.RegisterNewUser(context.Background(), creds.Login, creds.Password)
 		if err != nil {
 			if errors.Is(err, sso.ErrUserAlreadyExists) {
 				logger.Log.Error("register user", zap.Error(err))
