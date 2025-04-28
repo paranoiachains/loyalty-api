@@ -6,6 +6,7 @@ import (
 
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/sso-service/internal/grpc/auth"
+	"github.com/paranoiachains/loyalty-api/sso-service/internal/grpc/withdraw"
 	"google.golang.org/grpc"
 )
 
@@ -14,7 +15,7 @@ type App struct {
 	port       int
 }
 
-func New(authService auth.Auth, port int) *App {
+func NewAuth(authService auth.Auth, port int) *App {
 	gRPCServer := grpc.NewServer()
 
 	auth.Register(gRPCServer, authService)
@@ -24,6 +25,17 @@ func New(authService auth.Auth, port int) *App {
 		port:       port,
 	}
 
+}
+
+func NewWithdraw(withdrawService withdraw.Withdraw, port int) *App {
+	gRPCServer := grpc.NewServer()
+
+	withdraw.Register(gRPCServer, withdrawService)
+
+	return &App{
+		gRPCServer: gRPCServer,
+		port:       port,
+	}
 }
 
 func (a *App) MustRun() {

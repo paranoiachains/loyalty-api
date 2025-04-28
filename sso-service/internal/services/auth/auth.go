@@ -2,13 +2,19 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/pkg/models"
+	database "github.com/paranoiachains/loyalty-api/sso-service/internal/database/auth"
 	"github.com/paranoiachains/loyalty-api/sso-service/internal/lib/jwt"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	ErrWrongPassword = errors.New("wrong password")
 )
 
 type UserSaver interface {
@@ -53,6 +59,10 @@ func (a *Auth) RegisterNewUser(ctx context.Context, login string, password strin
 	userID, err = a.usrSaver.SaveUser(ctx, login, passHash)
 	if err != nil {
 		logger.Log.Error("save user", zap.Error(err))
+
+		if errors.Is(err, database.ErrUniqueUsername) {
+			return 0, database.ErrUniqueUsername
+		}
 		return 0, err
 	}
 
@@ -67,10 +77,12 @@ func (a *Auth) Login(ctx context.Context, login string, password string) (token 
 		return "", err
 	}
 
-	logger.Log.Debug("hash", zap.String("password", string(user.Password)))
-
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(password)); err != nil {
-		logger.Log.Info("compare password bcrypt", zap.Error(err))
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			logger.Log.Error("bcrypt", zap.Error(err))
+			return "", ErrWrongPassword
+		}
+		logger.Log.Error("bcrypt (unknown err)", zap.Error(err))
 		return "", err
 	}
 

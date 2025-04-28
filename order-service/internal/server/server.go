@@ -24,9 +24,9 @@ func New(a *app.App) *Server {
 	{
 		authGroup.POST("/api/user/orders", handlers.LoadOrder(a))
 		authGroup.GET("/api/user/orders", handlers.GetOrders(a))
-		authGroup.GET("/api/user/balance", handlers.GetBalance)
-		authGroup.POST("/api/user/balance/withdraw", handlers.RequestWithdraw)
-		authGroup.GET("/api/user/withdrawals", handlers.Withdrawals)
+		authGroup.GET("/api/user/balance", handlers.Balance(a))
+		authGroup.POST("/api/user/balance/withdraw", handlers.Withdraw(a))
+		authGroup.GET("/api/user/withdrawals", handlers.Withdrawals(a))
 	}
 
 	return &Server{engine: r}

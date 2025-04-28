@@ -9,6 +9,12 @@ service Auth {
     rpc Login (LoginRequest) returns (LoginResponse);
 }
 
+service Withdrawals {
+    rpc Balance (BalanceRequest) returns (BalanceResponse);
+    rpc Withdraw (WithdrawRequest) returns (WithdrawResponse);
+    rpc Withdrawals (WithdrawalsRequest) returns (WithdrawalsResponse);
+}
+
 message RegisterRequest {
     string login = 1;
     string password = 2;
@@ -25,4 +31,36 @@ message LoginRequest {
 
 message LoginResponse {
     string token = 1;
+}
+
+message BalanceRequest {
+    int64 user_id = 1;
+}
+
+message BalanceResponse {
+    double current = 1;
+    double withdrawn = 2;
+}
+
+message WithdrawRequest {
+    int64 order = 1;
+    int64 user_id = 2;
+    double sum = 3;
+}
+
+message WithdrawResponse {
+}
+
+message WithdrawalsRequest {
+    int64 user_id = 1;
+}
+
+message Withdrawal {
+    int64 order = 1;
+    double sum = 2;
+    string processed_at = 3; // дату и время лучше передавать как строку в RFC3339 формате
+}
+
+message WithdrawalsResponse {
+    repeated Withdrawal withdrawals = 1;
 }

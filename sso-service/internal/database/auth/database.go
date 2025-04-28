@@ -3,11 +3,17 @@ package database
 import (
 	"context"
 	"database/sql"
+	"errors"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/pkg/models"
 	"go.uber.org/zap"
+)
+
+var (
+	ErrUniqueUsername = errors.New("unique username must be set")
 )
 
 type Storage struct {
@@ -36,7 +42,13 @@ func (s Storage) SaveUser(ctx context.Context, login string, passHash []byte) (u
 	}
 
 	row := s.db.QueryRowContext(ctx, `SELECT user_id FROM users WHERE login = $1`)
-	row.Scan(&uid)
+	err = row.Scan(&uid)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return 0, ErrUniqueUsername
+		}
+	}
 
 	return uid, nil
 }
