@@ -77,13 +77,12 @@ func (a *Auth) Login(ctx context.Context, login string, password string) (token 
 		return "", err
 	}
 
-	logger.Log.Debug("hash", zap.String("password", string(user.Password)))
-
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(password)); err != nil {
-		logger.Log.Info("compare password bcrypt", zap.Error(err))
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			logger.Log.Error("bcrypt", zap.Error(err))
 			return "", ErrWrongPassword
 		}
+		logger.Log.Error("bcrypt (unknown err)", zap.Error(err))
 		return "", err
 	}
 

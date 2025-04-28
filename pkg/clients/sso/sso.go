@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	sso_grpc "github.com/paranoiachains/loyalty-api/grpc-service/gen/go/sso"
+	"github.com/paranoiachains/loyalty-api/pkg/logger"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
@@ -38,10 +40,13 @@ func (c *Client) Login(ctx context.Context, login string, password string) (stri
 		Password: password,
 	})
 	if err != nil {
+		logger.Log.Error("login", zap.Error(err))
 		st, ok := status.FromError(err)
 		if ok {
+			logger.Log.Debug("convert err to status", zap.Bool("ok", ok))
 			switch st.Code() {
 			case codes.PermissionDenied:
+				logger.Log.Debug("login (permission denied error)")
 				return "", ErrWrongPassword
 			default:
 				return "", fmt.Errorf("unexpected grpc error: %w", err)

@@ -5,8 +5,10 @@ import (
 	"errors"
 
 	sso "github.com/paranoiachains/loyalty-api/grpc-service/gen/go/sso"
+	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/sso-service/internal/database"
 	"github.com/paranoiachains/loyalty-api/sso-service/internal/services/auth"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -49,6 +51,7 @@ func (s *serverAPI) Login(
 	token, err := s.auth.Login(ctx, in.Login, in.Password)
 	if err != nil {
 		if errors.Is(err, auth.ErrWrongPassword) {
+			logger.Log.Debug("login", zap.Error(err))
 			return nil, status.Error(codes.PermissionDenied, "wrong password")
 		}
 		return nil, status.Error(codes.Internal, "failed to login")
