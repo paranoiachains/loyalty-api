@@ -2,8 +2,11 @@ package auth
 
 import (
 	"context"
+	"errors"
 
 	sso "github.com/paranoiachains/loyalty-api/grpc-service/gen/go/sso"
+	"github.com/paranoiachains/loyalty-api/sso-service/internal/database"
+	"github.com/paranoiachains/loyalty-api/sso-service/internal/services/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -45,6 +48,9 @@ func (s *serverAPI) Login(
 
 	token, err := s.auth.Login(ctx, in.Login, in.Password)
 	if err != nil {
+		if errors.Is(err, auth.ErrWrongPassword) {
+			return nil, status.Error(codes.PermissionDenied, "wrong password")
+		}
 		return nil, status.Error(codes.Internal, "failed to login")
 	}
 
@@ -65,6 +71,9 @@ func (s *serverAPI) Register(
 
 	id, err := s.auth.RegisterNewUser(ctx, in.Login, in.Password)
 	if err != nil {
+		if errors.Is(err, database.ErrUniqueUsername) {
+			return nil, status.Error(codes.AlreadyExists, "such username already exists")
+		}
 		return nil, status.Error(codes.Internal, "failed to register")
 	}
 
