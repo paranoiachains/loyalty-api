@@ -19,11 +19,11 @@ var (
 	ErrUserAlreadyExists = errors.New("such user already exists")
 )
 
-type Client struct {
+type AuthClient struct {
 	authClient sso_grpc.AuthClient
 }
 
-func New(address string) (*Client, error) {
+func New(address string) (*AuthClient, error) {
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
@@ -31,10 +31,10 @@ func New(address string) (*Client, error) {
 
 	client := sso_grpc.NewAuthClient(conn)
 
-	return &Client{authClient: client}, nil
+	return &AuthClient{authClient: client}, nil
 }
 
-func (c *Client) Login(ctx context.Context, login string, password string) (string, error) {
+func (c *AuthClient) Login(ctx context.Context, login string, password string) (string, error) {
 	resp, err := c.authClient.Login(ctx, &sso_grpc.LoginRequest{
 		Login:    login,
 		Password: password,
@@ -59,7 +59,7 @@ func (c *Client) Login(ctx context.Context, login string, password string) (stri
 	return resp.Token, nil
 }
 
-func (c *Client) RegisterNewUser(ctx context.Context, login string, password string) (int64, error) {
+func (c *AuthClient) RegisterNewUser(ctx context.Context, login string, password string) (int64, error) {
 	resp, err := c.authClient.Register(ctx, &sso_grpc.RegisterRequest{
 		Login:    login,
 		Password: password,
