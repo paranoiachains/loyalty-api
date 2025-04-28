@@ -4,7 +4,7 @@
 // 	protoc        v6.30.2
 // source: sso/sso.proto
 
-package sso_grpc
+package sso
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -213,6 +213,346 @@ func (x *LoginResponse) GetToken() string {
 	return ""
 }
 
+type BalanceRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BalanceRequest) Reset() {
+	*x = BalanceRequest{}
+	mi := &file_sso_sso_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BalanceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BalanceRequest) ProtoMessage() {}
+
+func (x *BalanceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BalanceRequest.ProtoReflect.Descriptor instead.
+func (*BalanceRequest) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *BalanceRequest) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type BalanceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Current       float64                `protobuf:"fixed64,1,opt,name=current,proto3" json:"current,omitempty"`
+	Withdrawn     float64                `protobuf:"fixed64,2,opt,name=withdrawn,proto3" json:"withdrawn,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BalanceResponse) Reset() {
+	*x = BalanceResponse{}
+	mi := &file_sso_sso_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BalanceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BalanceResponse) ProtoMessage() {}
+
+func (x *BalanceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BalanceResponse.ProtoReflect.Descriptor instead.
+func (*BalanceResponse) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *BalanceResponse) GetCurrent() float64 {
+	if x != nil {
+		return x.Current
+	}
+	return 0
+}
+
+func (x *BalanceResponse) GetWithdrawn() float64 {
+	if x != nil {
+		return x.Withdrawn
+	}
+	return 0
+}
+
+type WithdrawRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Order         int64                  `protobuf:"varint,1,opt,name=order,proto3" json:"order,omitempty"`
+	UserId        int64                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Sum           float64                `protobuf:"fixed64,3,opt,name=sum,proto3" json:"sum,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithdrawRequest) Reset() {
+	*x = WithdrawRequest{}
+	mi := &file_sso_sso_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawRequest) ProtoMessage() {}
+
+func (x *WithdrawRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawRequest.ProtoReflect.Descriptor instead.
+func (*WithdrawRequest) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *WithdrawRequest) GetOrder() int64 {
+	if x != nil {
+		return x.Order
+	}
+	return 0
+}
+
+func (x *WithdrawRequest) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *WithdrawRequest) GetSum() float64 {
+	if x != nil {
+		return x.Sum
+	}
+	return 0
+}
+
+type WithdrawResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithdrawResponse) Reset() {
+	*x = WithdrawResponse{}
+	mi := &file_sso_sso_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawResponse) ProtoMessage() {}
+
+func (x *WithdrawResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawResponse.ProtoReflect.Descriptor instead.
+func (*WithdrawResponse) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{7}
+}
+
+type WithdrawalsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithdrawalsRequest) Reset() {
+	*x = WithdrawalsRequest{}
+	mi := &file_sso_sso_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawalsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawalsRequest) ProtoMessage() {}
+
+func (x *WithdrawalsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawalsRequest.ProtoReflect.Descriptor instead.
+func (*WithdrawalsRequest) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *WithdrawalsRequest) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type Withdrawal struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Order         int64                  `protobuf:"varint,1,opt,name=order,proto3" json:"order,omitempty"`
+	Sum           float64                `protobuf:"fixed64,2,opt,name=sum,proto3" json:"sum,omitempty"`
+	ProcessedAt   string                 `protobuf:"bytes,3,opt,name=processed_at,json=processedAt,proto3" json:"processed_at,omitempty"` // дату и время лучше передавать как строку в RFC3339 формате
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Withdrawal) Reset() {
+	*x = Withdrawal{}
+	mi := &file_sso_sso_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Withdrawal) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Withdrawal) ProtoMessage() {}
+
+func (x *Withdrawal) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Withdrawal.ProtoReflect.Descriptor instead.
+func (*Withdrawal) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *Withdrawal) GetOrder() int64 {
+	if x != nil {
+		return x.Order
+	}
+	return 0
+}
+
+func (x *Withdrawal) GetSum() float64 {
+	if x != nil {
+		return x.Sum
+	}
+	return 0
+}
+
+func (x *Withdrawal) GetProcessedAt() string {
+	if x != nil {
+		return x.ProcessedAt
+	}
+	return ""
+}
+
+type WithdrawalsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Withdrawals   []*Withdrawal          `protobuf:"bytes,1,rep,name=withdrawals,proto3" json:"withdrawals,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithdrawalsResponse) Reset() {
+	*x = WithdrawalsResponse{}
+	mi := &file_sso_sso_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawalsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawalsResponse) ProtoMessage() {}
+
+func (x *WithdrawalsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawalsResponse.ProtoReflect.Descriptor instead.
+func (*WithdrawalsResponse) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *WithdrawalsResponse) GetWithdrawals() []*Withdrawal {
+	if x != nil {
+		return x.Withdrawals
+	}
+	return nil
+}
+
 var File_sso_sso_proto protoreflect.FileDescriptor
 
 const file_sso_sso_proto_rawDesc = "" +
@@ -227,11 +567,33 @@ const file_sso_sso_proto_rawDesc = "" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"%\n" +
 	"\rLoginResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token2s\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\")\n" +
+	"\x0eBalanceRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\"I\n" +
+	"\x0fBalanceResponse\x12\x18\n" +
+	"\acurrent\x18\x01 \x01(\x01R\acurrent\x12\x1c\n" +
+	"\twithdrawn\x18\x02 \x01(\x01R\twithdrawn\"R\n" +
+	"\x0fWithdrawRequest\x12\x14\n" +
+	"\x05order\x18\x01 \x01(\x03R\x05order\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x03R\x06userId\x12\x10\n" +
+	"\x03sum\x18\x03 \x01(\x01R\x03sum\"\x12\n" +
+	"\x10WithdrawResponse\"-\n" +
+	"\x12WithdrawalsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\"W\n" +
+	"\n" +
+	"Withdrawal\x12\x14\n" +
+	"\x05order\x18\x01 \x01(\x03R\x05order\x12\x10\n" +
+	"\x03sum\x18\x02 \x01(\x01R\x03sum\x12!\n" +
+	"\fprocessed_at\x18\x03 \x01(\tR\vprocessedAt\"I\n" +
+	"\x13WithdrawalsResponse\x122\n" +
+	"\vwithdrawals\x18\x01 \x03(\v2\x10.auth.WithdrawalR\vwithdrawals2s\n" +
 	"\x04Auth\x129\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x120\n" +
-	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponseB\n" +
-	"Z\bsso.grpcb\x06proto3"
+	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse2\xc4\x01\n" +
+	"\vWithdrawals\x126\n" +
+	"\aBalance\x12\x14.auth.BalanceRequest\x1a\x15.auth.BalanceResponse\x129\n" +
+	"\bWithdraw\x12\x15.auth.WithdrawRequest\x1a\x16.auth.WithdrawResponse\x12B\n" +
+	"\vWithdrawals\x12\x18.auth.WithdrawalsRequest\x1a\x19.auth.WithdrawalsResponseB?Z=github.com/paranoiachains/loyalty-api/grpc-service/gen/go/ssob\x06proto3"
 
 var (
 	file_sso_sso_proto_rawDescOnce sync.Once
@@ -245,23 +607,37 @@ func file_sso_sso_proto_rawDescGZIP() []byte {
 	return file_sso_sso_proto_rawDescData
 }
 
-var file_sso_sso_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_sso_sso_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_sso_sso_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: auth.RegisterRequest
-	(*RegisterResponse)(nil), // 1: auth.RegisterResponse
-	(*LoginRequest)(nil),     // 2: auth.LoginRequest
-	(*LoginResponse)(nil),    // 3: auth.LoginResponse
+	(*RegisterRequest)(nil),     // 0: auth.RegisterRequest
+	(*RegisterResponse)(nil),    // 1: auth.RegisterResponse
+	(*LoginRequest)(nil),        // 2: auth.LoginRequest
+	(*LoginResponse)(nil),       // 3: auth.LoginResponse
+	(*BalanceRequest)(nil),      // 4: auth.BalanceRequest
+	(*BalanceResponse)(nil),     // 5: auth.BalanceResponse
+	(*WithdrawRequest)(nil),     // 6: auth.WithdrawRequest
+	(*WithdrawResponse)(nil),    // 7: auth.WithdrawResponse
+	(*WithdrawalsRequest)(nil),  // 8: auth.WithdrawalsRequest
+	(*Withdrawal)(nil),          // 9: auth.Withdrawal
+	(*WithdrawalsResponse)(nil), // 10: auth.WithdrawalsResponse
 }
 var file_sso_sso_proto_depIdxs = []int32{
-	0, // 0: auth.Auth.Register:input_type -> auth.RegisterRequest
-	2, // 1: auth.Auth.Login:input_type -> auth.LoginRequest
-	1, // 2: auth.Auth.Register:output_type -> auth.RegisterResponse
-	3, // 3: auth.Auth.Login:output_type -> auth.LoginResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	9,  // 0: auth.WithdrawalsResponse.withdrawals:type_name -> auth.Withdrawal
+	0,  // 1: auth.Auth.Register:input_type -> auth.RegisterRequest
+	2,  // 2: auth.Auth.Login:input_type -> auth.LoginRequest
+	4,  // 3: auth.Withdrawals.Balance:input_type -> auth.BalanceRequest
+	6,  // 4: auth.Withdrawals.Withdraw:input_type -> auth.WithdrawRequest
+	8,  // 5: auth.Withdrawals.Withdrawals:input_type -> auth.WithdrawalsRequest
+	1,  // 6: auth.Auth.Register:output_type -> auth.RegisterResponse
+	3,  // 7: auth.Auth.Login:output_type -> auth.LoginResponse
+	5,  // 8: auth.Withdrawals.Balance:output_type -> auth.BalanceResponse
+	7,  // 9: auth.Withdrawals.Withdraw:output_type -> auth.WithdrawResponse
+	10, // 10: auth.Withdrawals.Withdrawals:output_type -> auth.WithdrawalsResponse
+	6,  // [6:11] is the sub-list for method output_type
+	1,  // [1:6] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_sso_sso_proto_init() }
@@ -275,9 +651,9 @@ func file_sso_sso_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sso_sso_proto_rawDesc), len(file_sso_sso_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   11,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_sso_sso_proto_goTypes,
 		DependencyIndexes: file_sso_sso_proto_depIdxs,
