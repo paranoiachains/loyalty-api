@@ -6,7 +6,7 @@ import (
 
 	sso "github.com/paranoiachains/loyalty-api/grpc-service/gen/go/sso"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
-	"github.com/paranoiachains/loyalty-api/sso-service/internal/database"
+	database "github.com/paranoiachains/loyalty-api/sso-service/internal/database/auth"
 	"github.com/paranoiachains/loyalty-api/sso-service/internal/services/auth"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

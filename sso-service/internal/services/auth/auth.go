@@ -7,7 +7,7 @@ import (
 
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/pkg/models"
-	"github.com/paranoiachains/loyalty-api/sso-service/internal/database"
+	database "github.com/paranoiachains/loyalty-api/sso-service/internal/database/auth"
 	"github.com/paranoiachains/loyalty-api/sso-service/internal/lib/jwt"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
