@@ -12,7 +12,7 @@ import (
 
 func main() {
 	auth := app.NewAuth(5000, time.Hour*1)
-	withdraw := app.NewWithdraw(5000)
+	withdraw := app.NewWithdraw(5001)
 
 	go auth.GRPCServer.MustRun()
 	go withdraw.GRPCServer.MustRun()

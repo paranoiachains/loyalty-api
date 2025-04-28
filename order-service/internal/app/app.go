@@ -6,7 +6,8 @@ import (
 	"github.com/paranoiachains/loyalty-api/order-service/internal/database"
 	"github.com/paranoiachains/loyalty-api/order-service/internal/process"
 	"github.com/paranoiachains/loyalty-api/pkg/app"
-	"github.com/paranoiachains/loyalty-api/pkg/clients/sso"
+	auth "github.com/paranoiachains/loyalty-api/pkg/clients/sso/auth"
+	withdraw "github.com/paranoiachains/loyalty-api/pkg/clients/sso/withdraw"
 	"github.com/paranoiachains/loyalty-api/pkg/flags"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/pkg/messaging"
@@ -20,7 +21,12 @@ func New(ctx context.Context) (*app.App, error) {
 		return nil, err
 	}
 
-	ssoClient, err := sso.New("sso-service:5000")
+	authClient, err := auth.New("sso-service:5000")
+	if err != nil {
+		return nil, err
+	}
+
+	withdrawClient, err := withdraw.New("sso-service:5001")
 	if err != nil {
 		return nil, err
 	}
@@ -40,6 +46,7 @@ func New(ctx context.Context) (*app.App, error) {
 			Broker:       orderKafka,
 			StatusBroker: statusKafka,
 		},
-		SSOClient: ssoClient,
+		AuthClient:     authClient,
+		WithdrawClient: withdrawClient,
 	}, nil
 }
