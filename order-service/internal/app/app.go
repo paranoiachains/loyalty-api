@@ -42,9 +42,10 @@ func New(ctx context.Context) (*app.App, error) {
 		Kafka:       orderKafka,
 		StatusKafka: statusKafka,
 		Processor: process.OrderProcessor{
-			DB:           db,
-			Broker:       orderKafka,
-			StatusBroker: statusKafka,
+			DB:             db,
+			Broker:         orderKafka,
+			StatusBroker:   statusKafka,
+			WithdrawClient: withdrawClient,
 		},
 		AuthClient:     authClient,
 		WithdrawClient: withdrawClient,

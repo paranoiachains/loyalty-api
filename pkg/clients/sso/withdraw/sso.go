@@ -2,6 +2,8 @@ package sso
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	sso_grpc "github.com/paranoiachains/loyalty-api/grpc-service/gen/go/sso"
@@ -9,7 +11,13 @@ import (
 	"github.com/paranoiachains/loyalty-api/pkg/models"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
+)
+
+var (
+	ErrNotEnough = errors.New("not enough points")
 )
 
 type WithdrawalsClient struct {
@@ -25,6 +33,23 @@ func New(address string) (*WithdrawalsClient, error) {
 	client := sso_grpc.NewWithdrawalsClient(conn)
 
 	return &WithdrawalsClient{withdrawalsClient: client}, nil
+}
+
+func (w *WithdrawalsClient) TopUp(ctx context.Context, userID int64, sum float64) error {
+	logger.Log.Info("grpc top up call", zap.Int64("user_id", userID), zap.Float64("sum", sum))
+
+	_, err := w.withdrawalsClient.TopUp(ctx, &sso_grpc.TopUpRequest{
+		UserId: userID,
+		Sum:    sum,
+	})
+	if err != nil {
+		logger.Log.Error("grpc call top up", zap.Error(err))
+		return err
+	}
+
+	logger.Log.Info("grpc top up call successful")
+
+	return nil
 }
 
 func (w *WithdrawalsClient) Balance(ctx context.Context, userID int64) (current float64, withdrawn float64, err error) {
@@ -51,8 +76,20 @@ func (w *WithdrawalsClient) Withdraw(ctx context.Context, order int64, userID in
 	})
 	if err != nil {
 		logger.Log.Error("withdraw grpc call", zap.Error(err))
+
+		st, ok := status.FromError(err)
+		if ok {
+			switch st.Code() {
+			case codes.Canceled:
+				return ErrNotEnough
+			default:
+				return fmt.Errorf("unexpected grpc error: %w", err)
+			}
+		}
 		return err
 	}
+
+	logger.Log.Info("grpc withdraw call successful")
 
 	return nil
 }

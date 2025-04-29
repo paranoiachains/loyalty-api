@@ -44,7 +44,7 @@ func main() {
 	go loyaltyApp.Processor.Process(context.Background())
 
 	r := gin.New()
-	r.Use(middleware.Logger(), middleware.Compression())
+	r.Use(middleware.Logger(), middleware.Compression(), middleware.Auth(), middleware.RateLimitMiddleware())
 	r.GET("/api/orders/:number", handlers.GetOrder(loyaltyApp))
 	r.Run(flags.AccrualSystemAddress)
 }

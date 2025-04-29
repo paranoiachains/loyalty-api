@@ -159,6 +159,7 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
+	Withdrawals_TopUp_FullMethodName       = "/auth.Withdrawals/TopUp"
 	Withdrawals_Balance_FullMethodName     = "/auth.Withdrawals/Balance"
 	Withdrawals_Withdraw_FullMethodName    = "/auth.Withdrawals/Withdraw"
 	Withdrawals_Withdrawals_FullMethodName = "/auth.Withdrawals/Withdrawals"
@@ -168,6 +169,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WithdrawalsClient interface {
+	TopUp(ctx context.Context, in *TopUpRequest, opts ...grpc.CallOption) (*TopUpResponse, error)
 	Balance(ctx context.Context, in *BalanceRequest, opts ...grpc.CallOption) (*BalanceResponse, error)
 	Withdraw(ctx context.Context, in *WithdrawRequest, opts ...grpc.CallOption) (*WithdrawResponse, error)
 	Withdrawals(ctx context.Context, in *WithdrawalsRequest, opts ...grpc.CallOption) (*WithdrawalsResponse, error)
@@ -179,6 +181,16 @@ type withdrawalsClient struct {
 
 func NewWithdrawalsClient(cc grpc.ClientConnInterface) WithdrawalsClient {
 	return &withdrawalsClient{cc}
+}
+
+func (c *withdrawalsClient) TopUp(ctx context.Context, in *TopUpRequest, opts ...grpc.CallOption) (*TopUpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TopUpResponse)
+	err := c.cc.Invoke(ctx, Withdrawals_TopUp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *withdrawalsClient) Balance(ctx context.Context, in *BalanceRequest, opts ...grpc.CallOption) (*BalanceResponse, error) {
@@ -215,6 +227,7 @@ func (c *withdrawalsClient) Withdrawals(ctx context.Context, in *WithdrawalsRequ
 // All implementations must embed UnimplementedWithdrawalsServer
 // for forward compatibility.
 type WithdrawalsServer interface {
+	TopUp(context.Context, *TopUpRequest) (*TopUpResponse, error)
 	Balance(context.Context, *BalanceRequest) (*BalanceResponse, error)
 	Withdraw(context.Context, *WithdrawRequest) (*WithdrawResponse, error)
 	Withdrawals(context.Context, *WithdrawalsRequest) (*WithdrawalsResponse, error)
@@ -228,6 +241,9 @@ type WithdrawalsServer interface {
 // pointer dereference when methods are called.
 type UnimplementedWithdrawalsServer struct{}
 
+func (UnimplementedWithdrawalsServer) TopUp(context.Context, *TopUpRequest) (*TopUpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TopUp not implemented")
+}
 func (UnimplementedWithdrawalsServer) Balance(context.Context, *BalanceRequest) (*BalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Balance not implemented")
 }
@@ -256,6 +272,24 @@ func RegisterWithdrawalsServer(s grpc.ServiceRegistrar, srv WithdrawalsServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Withdrawals_ServiceDesc, srv)
+}
+
+func _Withdrawals_TopUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TopUpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WithdrawalsServer).TopUp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Withdrawals_TopUp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WithdrawalsServer).TopUp(ctx, req.(*TopUpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Withdrawals_Balance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -319,6 +353,10 @@ var Withdrawals_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "auth.Withdrawals",
 	HandlerType: (*WithdrawalsServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "TopUp",
+			Handler:    _Withdrawals_TopUp_Handler,
+		},
 		{
 			MethodName: "Balance",
 			Handler:    _Withdrawals_Balance_Handler,
