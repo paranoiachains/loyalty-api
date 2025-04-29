@@ -1,6 +1,7 @@
 package app
 
 import (
+	"os"
 	"time"
 
 	grpcapp "github.com/paranoiachains/loyalty-api/sso-service/internal/app/grpc"
@@ -15,7 +16,7 @@ type App struct {
 }
 
 func NewAuth(grpcPort int, tokenTTL time.Duration) *App {
-	db, err := databaseauth.NewStorage("postgresql://postgres:postgres@postgres/sso_service?sslmode=disable")
+	db, err := databaseauth.NewStorage(os.Getenv("SSO_DB_DSN"))
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +31,7 @@ func NewAuth(grpcPort int, tokenTTL time.Duration) *App {
 }
 
 func NewWithdraw(grpcPort int) *App {
-	db, err := databasewithdraw.NewStorage("postgresql://postgres:postgres@postgres/sso_service?sslmode=disable")
+	db, err := databasewithdraw.NewStorage(os.Getenv("SSO_DB_DSN"))
 	if err != nil {
 		panic(err)
 	}
