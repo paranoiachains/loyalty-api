@@ -10,6 +10,17 @@ jobs:
     container: golang:1.23
 
     services:
+      postgres:
+          image: postgres
+          env:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: praktikum
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 5s
+            --health-timeout 5s
+            --health-retries 5
+
       order_service:
         image: postgres
         env:
@@ -109,7 +120,7 @@ jobs:
 
       - name: Start loyalty-service
         env:
-          ACCRUAL_DB_DSN: postgresql://postgres:postgres@order_service/order_service?sslmode=disable
+          ACCRUAL_DB_DSN: postgresql://postgres:postgres@loyalty_service/loyalty_service?sslmode=disable
         run: |
           ./bin/loyalty &
           sleep 5
@@ -134,5 +145,5 @@ jobs:
             -gophermart-database-uri="$DB_DSN" \
             -accrual-binary-path=$GITHUB_WORKSPACE/bin/accrual_linux_amd64 \
             -accrual-host=localhost \
-            -accrual-port=$(random unused-port)
-            -accrual-database-uri="postgresql://postgres:postgres@loyalty_service/loyalty_service?sslmode=disable"
+            -accrual-port=$(random unused-port) \
+            -accrual-database-uri="postgresql://postgres:postgres@/praktikum?sslmode=disable"
