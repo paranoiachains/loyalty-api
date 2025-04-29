@@ -21,12 +21,12 @@ func New(ctx context.Context) (*app.App, error) {
 		return nil, err
 	}
 
-	authClient, err := auth.New("sso-service:5000")
+	authClient, err := auth.New("sso_service:5000")
 	if err != nil {
 		return nil, err
 	}
 
-	withdrawClient, err := withdraw.New("sso-service:5001")
+	withdrawClient, err := withdraw.New("sso_service:5001")
 	if err != nil {
 		return nil, err
 	}
