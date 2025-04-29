@@ -59,7 +59,7 @@ func (c *AuthClient) Login(ctx context.Context, login string, password string) (
 	return resp.Token, nil
 }
 
-func (c *AuthClient) RegisterNewUser(ctx context.Context, login string, password string) (int64, error) {
+func (c *AuthClient) RegisterNewUser(ctx context.Context, login string, password string) (int64, string, error) {
 	resp, err := c.authClient.Register(ctx, &sso_grpc.RegisterRequest{
 		Login:    login,
 		Password: password,
@@ -69,14 +69,14 @@ func (c *AuthClient) RegisterNewUser(ctx context.Context, login string, password
 		if ok {
 			switch st.Code() {
 			case codes.AlreadyExists:
-				return 0, ErrUserAlreadyExists
+				return 0, "", ErrUserAlreadyExists
 			default:
-				return 0, fmt.Errorf("unexpected grpc error: %w", err)
+				return 0, "", fmt.Errorf("unexpected grpc error: %w", err)
 			}
 		} else {
-			return 0, err
+			return 0, "", err
 		}
 	}
 
-	return resp.UserId, nil
+	return resp.UserId, resp.Token, nil
 }

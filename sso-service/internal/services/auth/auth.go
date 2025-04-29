@@ -47,13 +47,13 @@ func New(
 	}
 }
 
-func (a *Auth) RegisterNewUser(ctx context.Context, login string, password string) (userID int64, err error) {
+func (a *Auth) RegisterNewUser(ctx context.Context, login string, password string) (userID int64, token string, err error) {
 	logger.Log.Info("registering user...")
 
 	passHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Log.Error("generate hash from password", zap.Error(err))
-		return 0, err
+		return 0, "", err
 	}
 
 	userID, err = a.usrSaver.SaveUser(ctx, login, passHash)
@@ -61,12 +61,17 @@ func (a *Auth) RegisterNewUser(ctx context.Context, login string, password strin
 		logger.Log.Error("save user", zap.Error(err))
 
 		if errors.Is(err, database.ErrUniqueUsername) {
-			return 0, database.ErrUniqueUsername
+			return 0, "", database.ErrUniqueUsername
 		}
-		return 0, err
+		return 0, "", err
 	}
 
-	return userID, nil
+	token, err = jwt.BuildJWTToken(userID)
+	if err != nil {
+		return 0, "", err
+	}
+
+	return userID, token, nil
 }
 
 func (a *Auth) Login(ctx context.Context, login string, password string) (token string, err error) {
