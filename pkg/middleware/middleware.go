@@ -3,6 +3,7 @@ package middleware
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -126,15 +127,15 @@ var (
 	mu       sync.Mutex
 )
 
-// возвращает лимитер для пользователя
 func getLimiter(userID int64) *rate.Limiter {
 	mu.Lock()
 	defer mu.Unlock()
 
 	limiter, exists := limiters[userID]
 	if !exists {
-		limiter = rate.NewLimiter(rate.Every(1*time.Second), 10)
+		limiter = rate.NewLimiter(rate.Every(6*time.Second), 10)
 		limiters[userID] = limiter
+		logger.Log.Info("created limiter", zap.Int64("user_id", userID))
 	}
 	return limiter
 }
@@ -151,7 +152,8 @@ func RateLimitMiddleware() gin.HandlerFunc {
 		limiter := getLimiter(userID)
 		if !limiter.Allow() {
 			c.Header("Retry-After", "60")
-			c.String(http.StatusTooManyRequests, "No more than 10 requests per minute allowed")
+			c.AbortWithError(http.StatusTooManyRequests,
+				&gin.Error{Err: fmt.Errorf("no more than 10 requests per minute allowed")})
 			return
 		}
 
