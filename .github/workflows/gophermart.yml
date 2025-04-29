@@ -137,14 +137,11 @@ jobs:
       - name: Init Kafka topics
         run: 
           echo "Creating Kafka topics..."
-          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
-            --topic order-created --partitions 1 --replication-factor 1
+          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic order-created --partitions 1 --replication-factor 1
 
-          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
-            --topic order-completed --partitions 1 --replication-factor 1
+          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic order-completed --partitions 1 --replication-factor 1
 
-          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
-            --topic order-status --partitions 1 --replication-factor 1
+          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic order-status --partitions 1 --replication-factor 1
 
       - name: Wait for Kafka
         run: |
