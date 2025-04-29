@@ -119,6 +119,31 @@ jobs:
           until pg_isready -h loyalty_service -p 5432 -U postgres; do sleep 1; done
           echo "Waiting for sso_service..."
           until pg_isready -h sso_service -p 5432 -U postgres; do sleep 1; done
+        
+      - name: Install Kafka CLI
+        run: |
+          curl -sL https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz | tar xz
+          export PATH=$PWD/kafka_2.13-3.7.0/bin:$PATH
+          echo "$PWD/kafka_2.13-3.7.0/bin" >> $GITHUB_PATH
+
+      - name: Wait for Kafka
+        run: |
+          echo "Waiting for Kafka..."
+          for i in {1..20}; do
+            if kafka-topics.sh --bootstrap-server kafka:9092 --list; then
+              echo "Kafka is ready"
+              break
+            fi
+            echo "Kafka not ready yet..."
+            sleep 5
+          done
+
+      - name: Init Kafka topics
+        run: |
+          echo "Creating Kafka topics..."
+          kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic order-created
+          kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic order-completed
+          kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic order-status
 
       - name: Test
         env:
