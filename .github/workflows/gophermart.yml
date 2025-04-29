@@ -105,6 +105,11 @@ jobs:
       - name: Install PostgreSQL client
         run: apt-get update && apt-get install -y postgresql-client
 
+      - name: Install Java (OpenJDK)
+        run: |
+          apt-get update
+          apt-get install -y openjdk-11-jdk
+
       - name: Init DB schema
         run: |
           PGPASSWORD=postgres psql -h order_service -U postgres -d order_service -f sql/migrations/init_order.sql
