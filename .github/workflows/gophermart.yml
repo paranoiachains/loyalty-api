@@ -104,6 +104,14 @@ jobs:
 
       - name: Install PostgreSQL client
         run: apt-get update && apt-get install -y postgresql-client
+      
+      - name: Install OpenJDK 24.0.1
+        run: |
+          curl -sL https://download.java.net/java/GA/jdk24.0.1/24a58e0e276943138bf3e963e6291ac2/9/GPL/openjdk-24.0.1_linux-x64_bin.tar.gz | tar xz -C /opt
+          export JAVA_HOME=/opt/jdk-24.0.1
+          export PATH=$JAVA_HOME/bin:$PATH
+          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
 
       - name: Init DB schema
         run: |
@@ -126,6 +134,18 @@ jobs:
           tar -xzf kafka.tgz
           echo "$PWD/kafka_2.13-3.7.0/bin" >> $GITHUB_PATH
 
+      - name: Init Kafka topics
+        run: 
+          echo "Creating Kafka topics..."
+          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
+            --topic order-created --partitions 1 --replication-factor 1
+
+          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
+            --topic order-completed --partitions 1 --replication-factor 1
+
+          kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
+            --topic order-status --partitions 1 --replication-factor 1
+
       - name: Wait for Kafka
         run: |
           echo "Waiting for Kafka..."
@@ -137,16 +157,6 @@ jobs:
             echo "Kafka not ready yet..."
             sleep 5
           done
-
-      - name: Init Kafka topics
-        run: 
-          echo "Creating Kafka topics..."
-          docker exec $(docker ps -qf "ancestor=confluentinc/cp-kafka:7.4.0") \
-            kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic order-created
-          docker exec $(docker ps -qf "ancestor=confluentinc/cp-kafka:7.4.0") \
-            kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic order-completed
-          docker exec $(docker ps -qf "ancestor=confluentinc/cp-kafka:7.4.0") \
-            kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic order-status
 
       - name: Test
         env:
