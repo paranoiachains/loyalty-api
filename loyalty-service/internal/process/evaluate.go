@@ -6,6 +6,6 @@ import (
 )
 
 func Evaluate() float64 {
-	time.Sleep(15 * time.Second)
+	time.Sleep(1 * time.Second)
 	return rand.Float64() * 500
 }
