@@ -15,18 +15,18 @@ import (
 )
 
 func New(ctx context.Context) (*app.App, error) {
-	logger.Log.Debug("Connecting to database", zap.String("dsn", flags.DatabaseDSN))
-	db, err := database.Connect(flags.DatabaseDSN)
+	logger.Log.Debug("Connecting to database", zap.String("dsn", flags.OrderDatabaseDSN))
+	db, err := database.Connect(flags.OrderDatabaseDSN)
 	if err != nil {
 		return nil, err
 	}
 
-	authClient, err := auth.New("localhost:5000")
+	authClient, err := auth.New("sso-service:5000")
 	if err != nil {
 		return nil, err
 	}
 
-	withdrawClient, err := withdraw.New("localhost:5001")
+	withdrawClient, err := withdraw.New("sso-service:5001")
 	if err != nil {
 		return nil, err
 	}

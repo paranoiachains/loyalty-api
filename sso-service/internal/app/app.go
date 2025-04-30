@@ -1,9 +1,9 @@
 package app
 
 import (
-	"os"
 	"time"
 
+	"github.com/paranoiachains/loyalty-api/pkg/flags"
 	grpcapp "github.com/paranoiachains/loyalty-api/sso-service/internal/app/grpc"
 	databaseauth "github.com/paranoiachains/loyalty-api/sso-service/internal/database/auth"
 	databasewithdraw "github.com/paranoiachains/loyalty-api/sso-service/internal/database/withdraw"
@@ -16,7 +16,7 @@ type App struct {
 }
 
 func NewAuth(grpcPort int, tokenTTL time.Duration) *App {
-	db, err := databaseauth.NewStorage(os.Getenv("SSO_DB_DSN"))
+	db, err := databaseauth.NewStorage(flags.SSODatabaseDSN)
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +31,7 @@ func NewAuth(grpcPort int, tokenTTL time.Duration) *App {
 }
 
 func NewWithdraw(grpcPort int) *App {
-	db, err := databasewithdraw.NewStorage(os.Getenv("SSO_DB_DSN"))
+	db, err := databasewithdraw.NewStorage(flags.SSODatabaseDSN)
 	if err != nil {
 		panic(err)
 	}
