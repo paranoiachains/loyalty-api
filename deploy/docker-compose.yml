@@ -6,8 +6,6 @@
         dockerfile: deploy/order-service.Dockerfile
       ports:
         - "8081:8080"
-      environment:
-        - DB_DSN=postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
 
     loyalty-service:
       restart: always
@@ -15,9 +13,7 @@
         context: ..
         dockerfile: deploy/loyalty-service.Dockerfile
       ports:
-        - "8082:8080"
-      environment:
-        - DB_DSN=postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
+        - "8082:8081"
 
     sso-service:
       restart: always

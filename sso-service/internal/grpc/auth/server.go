@@ -29,7 +29,7 @@ type Auth interface {
 		ctx context.Context,
 		login string,
 		password string,
-	) (userID int64, err error)
+	) (userID int64, token string, err error)
 }
 
 func Register(gRPCServer *grpc.Server, auth Auth) {
@@ -72,7 +72,7 @@ func (s *serverAPI) Register(
 		return nil, status.Error(codes.InvalidArgument, "password is required")
 	}
 
-	id, err := s.auth.RegisterNewUser(ctx, in.Login, in.Password)
+	id, token, err := s.auth.RegisterNewUser(ctx, in.Login, in.Password)
 	if err != nil {
 		if errors.Is(err, database.ErrUniqueUsername) {
 			return nil, status.Error(codes.AlreadyExists, "such username already exists")
@@ -80,6 +80,6 @@ func (s *serverAPI) Register(
 		return nil, status.Error(codes.Internal, "failed to register")
 	}
 
-	return &sso.RegisterResponse{UserId: id}, nil
+	return &sso.RegisterResponse{UserId: id, Token: token}, nil
 
 }

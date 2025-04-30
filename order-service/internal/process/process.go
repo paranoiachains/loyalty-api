@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	ssowithdraw "github.com/paranoiachains/loyalty-api/pkg/clients/sso/withdraw"
 	"github.com/paranoiachains/loyalty-api/pkg/database"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"github.com/paranoiachains/loyalty-api/pkg/messaging"
@@ -12,9 +13,10 @@ import (
 )
 
 type OrderProcessor struct {
-	DB           database.Storage
-	Broker       messaging.MessageBroker
-	StatusBroker messaging.MessageBroker
+	DB             database.Storage
+	Broker         messaging.MessageBroker
+	StatusBroker   messaging.MessageBroker
+	WithdrawClient *ssowithdraw.WithdrawalsClient
 }
 
 func (p OrderProcessor) Process(ctx context.Context) {
@@ -41,6 +43,13 @@ func (p OrderProcessor) Process(ctx context.Context) {
 			err = p.DB.UpdateAccrual(ctx, order.AccrualOrderID, order.Accrual)
 			if err != nil {
 				logger.Log.Error("update accrual", zap.Error(err))
+				continue
+			}
+
+			logger.Log.Info("sending a top up request", zap.Int("user_id", order.UserID), zap.Float64("sum", order.Accrual))
+			err = p.WithdrawClient.TopUp(ctx, int64(order.UserID), order.Accrual)
+			if err != nil {
+				logger.Log.Error("process top up call", zap.Error(err))
 				continue
 			}
 		case data, ok := <-statusCh:

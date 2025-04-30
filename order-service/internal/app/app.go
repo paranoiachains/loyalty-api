@@ -21,12 +21,12 @@ func New(ctx context.Context) (*app.App, error) {
 		return nil, err
 	}
 
-	authClient, err := auth.New("sso-service:5000")
+	authClient, err := auth.New("localhost:5000")
 	if err != nil {
 		return nil, err
 	}
 
-	withdrawClient, err := withdraw.New("sso-service:5001")
+	withdrawClient, err := withdraw.New("localhost:5001")
 	if err != nil {
 		return nil, err
 	}
@@ -42,9 +42,10 @@ func New(ctx context.Context) (*app.App, error) {
 		Kafka:       orderKafka,
 		StatusKafka: statusKafka,
 		Processor: process.OrderProcessor{
-			DB:           db,
-			Broker:       orderKafka,
-			StatusBroker: statusKafka,
+			DB:             db,
+			Broker:         orderKafka,
+			StatusBroker:   statusKafka,
+			WithdrawClient: withdrawClient,
 		},
 		AuthClient:     authClient,
 		WithdrawClient: withdrawClient,

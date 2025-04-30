@@ -23,7 +23,7 @@ func Register(a *app.App) gin.HandlerFunc {
 			return
 		}
 
-		_, err := a.AuthClient.RegisterNewUser(context.Background(), creds.Login, creds.Password)
+		_, token, err := a.AuthClient.RegisterNewUser(context.Background(), creds.Login, creds.Password)
 		if err != nil {
 			if errors.Is(err, sso.ErrUserAlreadyExists) {
 				logger.Log.Error("register user", zap.Error(err))
@@ -34,6 +34,16 @@ func Register(a *app.App) gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
+
+		c.SetCookie(
+			"jwt_token",
+			token,
+			3600,
+			"/",
+			"",
+			false,
+			true,
+		)
 
 		c.String(http.StatusOK, "user registered successfully!")
 	}

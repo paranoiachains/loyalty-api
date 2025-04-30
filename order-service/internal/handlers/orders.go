@@ -102,6 +102,10 @@ func GetOrders(app *app.App) gin.HandlerFunc {
 			return
 		}
 
+		if len(orders) == 0 {
+			c.String(http.StatusNoContent, "no orders")
+		}
+
 		c.JSON(http.StatusOK, orders)
 	}
 }

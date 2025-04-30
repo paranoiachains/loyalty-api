@@ -76,6 +76,7 @@ func (x *RegisterRequest) GetPassword() string {
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -115,6 +116,13 @@ func (x *RegisterResponse) GetUserId() int64 {
 		return x.UserId
 	}
 	return 0
+}
+
+func (x *RegisterResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
 }
 
 type LoginRequest struct {
@@ -213,6 +221,94 @@ func (x *LoginResponse) GetToken() string {
 	return ""
 }
 
+type TopUpRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Sum           float64                `protobuf:"fixed64,2,opt,name=sum,proto3" json:"sum,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TopUpRequest) Reset() {
+	*x = TopUpRequest{}
+	mi := &file_sso_sso_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TopUpRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TopUpRequest) ProtoMessage() {}
+
+func (x *TopUpRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TopUpRequest.ProtoReflect.Descriptor instead.
+func (*TopUpRequest) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *TopUpRequest) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *TopUpRequest) GetSum() float64 {
+	if x != nil {
+		return x.Sum
+	}
+	return 0
+}
+
+type TopUpResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TopUpResponse) Reset() {
+	*x = TopUpResponse{}
+	mi := &file_sso_sso_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TopUpResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TopUpResponse) ProtoMessage() {}
+
+func (x *TopUpResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sso_sso_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TopUpResponse.ProtoReflect.Descriptor instead.
+func (*TopUpResponse) Descriptor() ([]byte, []int) {
+	return file_sso_sso_proto_rawDescGZIP(), []int{5}
+}
+
 type BalanceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -222,7 +318,7 @@ type BalanceRequest struct {
 
 func (x *BalanceRequest) Reset() {
 	*x = BalanceRequest{}
-	mi := &file_sso_sso_proto_msgTypes[4]
+	mi := &file_sso_sso_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -234,7 +330,7 @@ func (x *BalanceRequest) String() string {
 func (*BalanceRequest) ProtoMessage() {}
 
 func (x *BalanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_sso_sso_proto_msgTypes[4]
+	mi := &file_sso_sso_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -247,7 +343,7 @@ func (x *BalanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BalanceRequest.ProtoReflect.Descriptor instead.
 func (*BalanceRequest) Descriptor() ([]byte, []int) {
-	return file_sso_sso_proto_rawDescGZIP(), []int{4}
+	return file_sso_sso_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *BalanceRequest) GetUserId() int64 {
@@ -267,7 +363,7 @@ type BalanceResponse struct {
 
 func (x *BalanceResponse) Reset() {
 	*x = BalanceResponse{}
-	mi := &file_sso_sso_proto_msgTypes[5]
+	mi := &file_sso_sso_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -279,7 +375,7 @@ func (x *BalanceResponse) String() string {
 func (*BalanceResponse) ProtoMessage() {}
 
 func (x *BalanceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sso_sso_proto_msgTypes[5]
+	mi := &file_sso_sso_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -292,7 +388,7 @@ func (x *BalanceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BalanceResponse.ProtoReflect.Descriptor instead.
 func (*BalanceResponse) Descriptor() ([]byte, []int) {
-	return file_sso_sso_proto_rawDescGZIP(), []int{5}
+	return file_sso_sso_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *BalanceResponse) GetCurrent() float64 {
@@ -320,7 +416,7 @@ type WithdrawRequest struct {
 
 func (x *WithdrawRequest) Reset() {
 	*x = WithdrawRequest{}
-	mi := &file_sso_sso_proto_msgTypes[6]
+	mi := &file_sso_sso_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -332,7 +428,7 @@ func (x *WithdrawRequest) String() string {
 func (*WithdrawRequest) ProtoMessage() {}
 
 func (x *WithdrawRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_sso_sso_proto_msgTypes[6]
+	mi := &file_sso_sso_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -345,7 +441,7 @@ func (x *WithdrawRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WithdrawRequest.ProtoReflect.Descriptor instead.
 func (*WithdrawRequest) Descriptor() ([]byte, []int) {
-	return file_sso_sso_proto_rawDescGZIP(), []int{6}
+	return file_sso_sso_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *WithdrawRequest) GetOrder() int64 {
@@ -377,7 +473,7 @@ type WithdrawResponse struct {
 
 func (x *WithdrawResponse) Reset() {
 	*x = WithdrawResponse{}
-	mi := &file_sso_sso_proto_msgTypes[7]
+	mi := &file_sso_sso_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -389,7 +485,7 @@ func (x *WithdrawResponse) String() string {
 func (*WithdrawResponse) ProtoMessage() {}
 
 func (x *WithdrawResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sso_sso_proto_msgTypes[7]
+	mi := &file_sso_sso_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -402,7 +498,7 @@ func (x *WithdrawResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WithdrawResponse.ProtoReflect.Descriptor instead.
 func (*WithdrawResponse) Descriptor() ([]byte, []int) {
-	return file_sso_sso_proto_rawDescGZIP(), []int{7}
+	return file_sso_sso_proto_rawDescGZIP(), []int{9}
 }
 
 type WithdrawalsRequest struct {
@@ -414,7 +510,7 @@ type WithdrawalsRequest struct {
 
 func (x *WithdrawalsRequest) Reset() {
 	*x = WithdrawalsRequest{}
-	mi := &file_sso_sso_proto_msgTypes[8]
+	mi := &file_sso_sso_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -426,7 +522,7 @@ func (x *WithdrawalsRequest) String() string {
 func (*WithdrawalsRequest) ProtoMessage() {}
 
 func (x *WithdrawalsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_sso_sso_proto_msgTypes[8]
+	mi := &file_sso_sso_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -439,7 +535,7 @@ func (x *WithdrawalsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WithdrawalsRequest.ProtoReflect.Descriptor instead.
 func (*WithdrawalsRequest) Descriptor() ([]byte, []int) {
-	return file_sso_sso_proto_rawDescGZIP(), []int{8}
+	return file_sso_sso_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *WithdrawalsRequest) GetUserId() int64 {
@@ -460,7 +556,7 @@ type Withdrawal struct {
 
 func (x *Withdrawal) Reset() {
 	*x = Withdrawal{}
-	mi := &file_sso_sso_proto_msgTypes[9]
+	mi := &file_sso_sso_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -472,7 +568,7 @@ func (x *Withdrawal) String() string {
 func (*Withdrawal) ProtoMessage() {}
 
 func (x *Withdrawal) ProtoReflect() protoreflect.Message {
-	mi := &file_sso_sso_proto_msgTypes[9]
+	mi := &file_sso_sso_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -485,7 +581,7 @@ func (x *Withdrawal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Withdrawal.ProtoReflect.Descriptor instead.
 func (*Withdrawal) Descriptor() ([]byte, []int) {
-	return file_sso_sso_proto_rawDescGZIP(), []int{9}
+	return file_sso_sso_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *Withdrawal) GetOrder() int64 {
@@ -518,7 +614,7 @@ type WithdrawalsResponse struct {
 
 func (x *WithdrawalsResponse) Reset() {
 	*x = WithdrawalsResponse{}
-	mi := &file_sso_sso_proto_msgTypes[10]
+	mi := &file_sso_sso_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -530,7 +626,7 @@ func (x *WithdrawalsResponse) String() string {
 func (*WithdrawalsResponse) ProtoMessage() {}
 
 func (x *WithdrawalsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sso_sso_proto_msgTypes[10]
+	mi := &file_sso_sso_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -543,7 +639,7 @@ func (x *WithdrawalsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WithdrawalsResponse.ProtoReflect.Descriptor instead.
 func (*WithdrawalsResponse) Descriptor() ([]byte, []int) {
-	return file_sso_sso_proto_rawDescGZIP(), []int{10}
+	return file_sso_sso_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *WithdrawalsResponse) GetWithdrawals() []*Withdrawal {
@@ -560,14 +656,19 @@ const file_sso_sso_proto_rawDesc = "" +
 	"\rsso/sso.proto\x12\x04auth\"C\n" +
 	"\x0fRegisterRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"+\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"A\n" +
 	"\x10RegisterResponse\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x03R\x06userId\"@\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x14\n" +
+	"\x05token\x18\x02 \x01(\tR\x05token\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"%\n" +
 	"\rLoginResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\")\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"9\n" +
+	"\fTopUpRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x10\n" +
+	"\x03sum\x18\x02 \x01(\x01R\x03sum\"\x0f\n" +
+	"\rTopUpResponse\")\n" +
 	"\x0eBalanceRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x03R\x06userId\"I\n" +
 	"\x0fBalanceResponse\x12\x18\n" +
@@ -589,8 +690,9 @@ const file_sso_sso_proto_rawDesc = "" +
 	"\vwithdrawals\x18\x01 \x03(\v2\x10.auth.WithdrawalR\vwithdrawals2s\n" +
 	"\x04Auth\x129\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x120\n" +
-	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse2\xc4\x01\n" +
-	"\vWithdrawals\x126\n" +
+	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse2\xf6\x01\n" +
+	"\vWithdrawals\x120\n" +
+	"\x05TopUp\x12\x12.auth.TopUpRequest\x1a\x13.auth.TopUpResponse\x126\n" +
 	"\aBalance\x12\x14.auth.BalanceRequest\x1a\x15.auth.BalanceResponse\x129\n" +
 	"\bWithdraw\x12\x15.auth.WithdrawRequest\x1a\x16.auth.WithdrawResponse\x12B\n" +
 	"\vWithdrawals\x12\x18.auth.WithdrawalsRequest\x1a\x19.auth.WithdrawalsResponseB?Z=github.com/paranoiachains/loyalty-api/grpc-service/gen/go/ssob\x06proto3"
@@ -607,34 +709,38 @@ func file_sso_sso_proto_rawDescGZIP() []byte {
 	return file_sso_sso_proto_rawDescData
 }
 
-var file_sso_sso_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_sso_sso_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_sso_sso_proto_goTypes = []any{
 	(*RegisterRequest)(nil),     // 0: auth.RegisterRequest
 	(*RegisterResponse)(nil),    // 1: auth.RegisterResponse
 	(*LoginRequest)(nil),        // 2: auth.LoginRequest
 	(*LoginResponse)(nil),       // 3: auth.LoginResponse
-	(*BalanceRequest)(nil),      // 4: auth.BalanceRequest
-	(*BalanceResponse)(nil),     // 5: auth.BalanceResponse
-	(*WithdrawRequest)(nil),     // 6: auth.WithdrawRequest
-	(*WithdrawResponse)(nil),    // 7: auth.WithdrawResponse
-	(*WithdrawalsRequest)(nil),  // 8: auth.WithdrawalsRequest
-	(*Withdrawal)(nil),          // 9: auth.Withdrawal
-	(*WithdrawalsResponse)(nil), // 10: auth.WithdrawalsResponse
+	(*TopUpRequest)(nil),        // 4: auth.TopUpRequest
+	(*TopUpResponse)(nil),       // 5: auth.TopUpResponse
+	(*BalanceRequest)(nil),      // 6: auth.BalanceRequest
+	(*BalanceResponse)(nil),     // 7: auth.BalanceResponse
+	(*WithdrawRequest)(nil),     // 8: auth.WithdrawRequest
+	(*WithdrawResponse)(nil),    // 9: auth.WithdrawResponse
+	(*WithdrawalsRequest)(nil),  // 10: auth.WithdrawalsRequest
+	(*Withdrawal)(nil),          // 11: auth.Withdrawal
+	(*WithdrawalsResponse)(nil), // 12: auth.WithdrawalsResponse
 }
 var file_sso_sso_proto_depIdxs = []int32{
-	9,  // 0: auth.WithdrawalsResponse.withdrawals:type_name -> auth.Withdrawal
+	11, // 0: auth.WithdrawalsResponse.withdrawals:type_name -> auth.Withdrawal
 	0,  // 1: auth.Auth.Register:input_type -> auth.RegisterRequest
 	2,  // 2: auth.Auth.Login:input_type -> auth.LoginRequest
-	4,  // 3: auth.Withdrawals.Balance:input_type -> auth.BalanceRequest
-	6,  // 4: auth.Withdrawals.Withdraw:input_type -> auth.WithdrawRequest
-	8,  // 5: auth.Withdrawals.Withdrawals:input_type -> auth.WithdrawalsRequest
-	1,  // 6: auth.Auth.Register:output_type -> auth.RegisterResponse
-	3,  // 7: auth.Auth.Login:output_type -> auth.LoginResponse
-	5,  // 8: auth.Withdrawals.Balance:output_type -> auth.BalanceResponse
-	7,  // 9: auth.Withdrawals.Withdraw:output_type -> auth.WithdrawResponse
-	10, // 10: auth.Withdrawals.Withdrawals:output_type -> auth.WithdrawalsResponse
-	6,  // [6:11] is the sub-list for method output_type
-	1,  // [1:6] is the sub-list for method input_type
+	4,  // 3: auth.Withdrawals.TopUp:input_type -> auth.TopUpRequest
+	6,  // 4: auth.Withdrawals.Balance:input_type -> auth.BalanceRequest
+	8,  // 5: auth.Withdrawals.Withdraw:input_type -> auth.WithdrawRequest
+	10, // 6: auth.Withdrawals.Withdrawals:input_type -> auth.WithdrawalsRequest
+	1,  // 7: auth.Auth.Register:output_type -> auth.RegisterResponse
+	3,  // 8: auth.Auth.Login:output_type -> auth.LoginResponse
+	5,  // 9: auth.Withdrawals.TopUp:output_type -> auth.TopUpResponse
+	7,  // 10: auth.Withdrawals.Balance:output_type -> auth.BalanceResponse
+	9,  // 11: auth.Withdrawals.Withdraw:output_type -> auth.WithdrawResponse
+	12, // 12: auth.Withdrawals.Withdrawals:output_type -> auth.WithdrawalsResponse
+	7,  // [7:13] is the sub-list for method output_type
+	1,  // [1:7] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name
@@ -651,7 +757,7 @@ func file_sso_sso_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sso_sso_proto_rawDesc), len(file_sso_sso_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

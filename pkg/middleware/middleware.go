@@ -3,15 +3,18 @@ package middleware
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/paranoiachains/loyalty-api/pkg/logger"
 	"go.uber.org/zap"
+	"golang.org/x/time/rate"
 )
 
 func Logger() gin.HandlerFunc {
@@ -114,6 +117,45 @@ func Auth() gin.HandlerFunc {
 		}
 
 		c.Set("userID", claims.UserID)
+
+		c.Next()
+	}
+}
+
+var (
+	limiters = make(map[int64]*rate.Limiter)
+	mu       sync.Mutex
+)
+
+func getLimiter(userID int64) *rate.Limiter {
+	mu.Lock()
+	defer mu.Unlock()
+
+	limiter, exists := limiters[userID]
+	if !exists {
+		limiter = rate.NewLimiter(rate.Every(6*time.Second), 10)
+		limiters[userID] = limiter
+		logger.Log.Info("created limiter", zap.Int64("user_id", userID))
+	}
+	return limiter
+}
+
+func RateLimitMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		val, ok := c.Get("userID")
+		if !ok {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		userID := val.(int64)
+
+		limiter := getLimiter(userID)
+		if !limiter.Allow() {
+			c.Header("Retry-After", "60")
+			c.AbortWithError(http.StatusTooManyRequests,
+				&gin.Error{Err: fmt.Errorf("no more than 10 requests per minute allowed")})
+			return
+		}
 
 		c.Next()
 	}

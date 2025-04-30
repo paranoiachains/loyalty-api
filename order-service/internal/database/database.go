@@ -109,7 +109,6 @@ func (db OrderStorage) CreateAccrual(ctx context.Context, accrualOrderID int, us
 		INSERT INTO accruals (accrual_order_id, user_id, status)
 		VALUES ($1, $2, $3);
 	`
-
 	_, err = db.ExecContext(ctx, query, accrualOrderID, userID, "NEW")
 	if err != nil {
 		return nil, err
@@ -159,12 +158,6 @@ func (db OrderStorage) UpdateAccrual(ctx context.Context, accrualOrderID int, ac
 	SET accrual = $1
 	WHERE accrual_order_id = $2;
 	`
-	queryBalance := `
-	UPDATE users
-	SET balance = balance + $1
-	WHERE user_id = (SELECT user_id FROM accruals WHERE accrual_order_id = $2);
-	`
-
 	logger.Log.Info("updating accrual, starting tx...")
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
@@ -176,13 +169,6 @@ func (db OrderStorage) UpdateAccrual(ctx context.Context, accrualOrderID int, ac
 	_, err = tx.ExecContext(ctx, queryAccrual, accrual, accrualOrderID)
 	if err != nil {
 		logger.Log.Error("update accrual db query", zap.Error(err))
-		tx.Rollback()
-		return err
-	}
-
-	_, err = tx.ExecContext(ctx, queryBalance, accrual, accrualOrderID)
-	if err != nil {
-		logger.Log.Error("update balance db query", zap.Error(err))
 		tx.Rollback()
 		return err
 	}

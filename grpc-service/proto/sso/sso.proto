@@ -10,6 +10,7 @@ service Auth {
 }
 
 service Withdrawals {
+    rpc TopUp (TopUpRequest) returns (TopUpResponse);
     rpc Balance (BalanceRequest) returns (BalanceResponse);
     rpc Withdraw (WithdrawRequest) returns (WithdrawResponse);
     rpc Withdrawals (WithdrawalsRequest) returns (WithdrawalsResponse);
@@ -22,6 +23,7 @@ message RegisterRequest {
 
 message RegisterResponse {
     int64 user_id = 1;
+    string token = 2;
 }
 
 message LoginRequest {
@@ -31,6 +33,14 @@ message LoginRequest {
 
 message LoginResponse {
     string token = 1;
+}
+
+message TopUpRequest {
+    int64 user_id = 1;
+    double sum = 2;
+}
+
+message TopUpResponse {
 }
 
 message BalanceRequest {

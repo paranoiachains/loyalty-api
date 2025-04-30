@@ -28,6 +28,10 @@ func GetOrder(app *app.App) gin.HandlerFunc {
 			return
 		}
 
+		if order == nil {
+			c.String(http.StatusNoContent, "no such order")
+		}
+
 		c.JSON(http.StatusOK, order)
 	}
 }

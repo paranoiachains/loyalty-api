@@ -38,16 +38,19 @@ func (s Storage) SaveUser(ctx context.Context, login string, passHash []byte) (u
 
 	_, err = s.db.ExecContext(ctx, query, login, string(passHash))
 	if err != nil {
-		return 0, err
-	}
-
-	row := s.db.QueryRowContext(ctx, `SELECT user_id FROM users WHERE login = $1`)
-	err = row.Scan(&uid)
-	if err != nil {
+		logger.Log.Error("create user (db layer)", zap.Error(err))
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
 			return 0, ErrUniqueUsername
 		}
+		return 0, err
+	}
+
+	row := s.db.QueryRowContext(ctx, `SELECT user_id FROM users WHERE login = $1`, login)
+	err = row.Scan(&uid)
+	if err != nil {
+		logger.Log.Error("retrieve user (db layer)", zap.Error(err))
+		return 0, err
 	}
 
 	return uid, nil
